@@ -382,50 +382,55 @@ class Renderer:
     def _render_line(self, tag, query, dups_fnames):
         """To format a single line with the tag information."""
 
-        # Format tag file
         def fmt_file(tag):
+            """Format tag file."""
             pmod = settings.get("project_search_modifier")
             bmod = settings.get("buffer_search_modifier")
 
             file = tag["file"].encode('utf-8')
-            # The search scope is the current projet and a project root exists
-            root = self.plug.services.curr_project.get_root()
-            if query.startswith(pmod) and root:
-                f = file.replace(root, "")
-                if f.startswith(os.path.sep):
-                    f = file[1:]
-            else:
-                f = file.replace(os.path.expanduser("~"), "~")
 
-            # If no search query, only tags for the current buffer are displayed
-            cond1 = not query
-            # The current search scope is the current buffer
-            cond2 = query.startswith(bmod)
-            cond3 = not settings.get("tag_file_full_path", bool)
-            if cond1 or cond2 or cond3:
-                f = os.path.basename(file)
-                # If this file names is duplicate in the search result list,
-                # then display also the container directory
-                if file in dups_fnames and len(file.split(os.path.sep)) > 1:
-                    f = os.path.join(*file.split(os.path.sep)[-2:])
+            if settings.get("tag_file_full_path", bool):
+                root = self.plug.services.curr_project.get_root()
+                if query.startswith(pmod) and root:
+                    # The search scope is the current projet and the project
+                    # root exists
+                    f = file.replace(root, "")
+                    return f[1:] if f.startswith(os.path.sep) else f
+                else:
+                    # The search scope is the current projet but there
+                    # is no project root
+                    return file.replace(os.path.expanduser("~"), "~")
 
-            return f
+            # If the `g:tsurf_tag_file_custom_depth` is set,
+            # cut the path according its value
+            depth = settings.get("tag_file_custom_depth", int)
+            if depth > 0:
+                return os.path.join(*file.split(os.path.sep)[-depth:])
 
-        # Format debug information
+            # If th file name is duplicate in among search results
+            # then display also the container directory
+            if file in dups_fnames and len(file.split(os.path.sep)) > 1:
+                return os.path.join(*file.split(os.path.sep)[-2:])
+
+            # By default display only the file name
+            return os.path.basename(file)
+
         def fmt_debug(tag):
+            """Format debug information."""
             if settings.get("debug", bool):
                 return  " | debug: ({:.4f}|{})".format(
                     tag["score"], tag["match_positions"])
             return ""
 
-        # Get line number if available
         def get_linenr(tag):
+            """Get line number if available."""
             if tag["exts"].get("line") or tag["excmd"].isdigit():
                 return tag["exts"].get("line", tag["excmd"])
             else:
                 return ""
 
         def fmt(fmtstr):
+            """Replace the attribute in `fmtdtr` with its value."""
             if "{name}" in fmtstr:
                 return fmtstr.replace("{name}", tag["name"])
             if "{excmd}" in fmtstr:
