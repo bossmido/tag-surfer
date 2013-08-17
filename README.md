@@ -69,25 +69,33 @@ Using **Om** is straightforward. To search for tags in all loaded buffers execut
 `:Om` command. With no input specified you are presented with a list of tags for the
 current buffer ordered by their relative position to the cursor. 
 As you start typing something you'll see the list updating with all the tags that match the 
-given input. Below there is list of all actions that you can performs with the tag list:
+given input. Below is list of all actions that you can performs with the tag list:
 
 * `UP`, `TAB`, `CTRL+K`: move up.
 * `DOWN`, `CTRL+J`: move down.
-* `RETURN`, `CTRL+O`, `CTRL+E`: go to the selected tag.
+* `RETURN`, `CTRL+O`, `CTRL+E`: jump to the selected tag.
 * `CTRL+P`: open a preview window for the selected tag.
 * `CTRL+S`: split the window for the selected tag.
-* `ESC`, `CTRL+C`: close the list.
+* `ESC`, `CTRL+C`: close the search results list.
 * `CTRL+U`: clear the current search.
+
+
+Note that when you jump to a tag you can jump back to the previous position
+pressing `CTRL+T`, just as you would normally do in Vim! 
+
 
 ### Modifiers and the search scope
 
 Searches are not limited to the loaded buffers. You can narrow or widen
 the search scope using modifiers. A modifier is simply a special letter that
-you prepend to the your search string. Below there is list of all available modifiers:
+you prepend to your search query. Below is list of all available modifiers:
 
 * `%`: this modifier narrows the search scope to the current buffer.
 * `#`: this modifier windes the search scope to all files of the current project 
-    (filtered by `wildignore` and `g:om_project_search_ignore` options).
+    filtered by `wildignore` and `g:om_project_search_ignore` options. Note that 
+    a project root is assumed to be the folder that contains any of the file or directory
+    names listed in the `g:om_root_markers` option (by default these markers are 
+    `.git`, `.svn`, `.hg`, `.bzr` and `_darcs`).
 
 ### Two kinds of search
 
