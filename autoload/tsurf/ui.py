@@ -78,7 +78,7 @@ class UserInterface:
             # Wait for the next key
             key.get()
 
-            if (key.RETURN or key.CTRL and key.CHAR in ('o', 'e', 'p', 's')):
+            if (key.RETURN or key.CTRL and key.CHAR in ('g', 'o', 'p', 's')):
                 # Go to the tag on the current line
                 prefix = key.CHAR if key.CHAR in ('s', 'p') else ''
                 if self._open_selected_tag(prefix):
