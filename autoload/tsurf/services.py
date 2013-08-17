@@ -47,7 +47,9 @@ class CurrentProjectService:
                 # Get all files for the current project. Note that the `glob()`
                 # function ignore everything that matches with any of the
                 # wildcards listed in the `wildignore` option.
-                expr = os.path.join(root, "**")
+                # Note: the `glob()` function wants forward slashes even on
+                # Windows
+                expr = os.path.join(root, "**").replace("\\", "/")
                 files = vim.eval('glob("{}")'.format(expr)).split("\n")
                 self.files_cache = files
                 # Restore the wildignore option
