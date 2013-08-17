@@ -81,8 +81,8 @@ class CurrentProjectService:
         `markers` is a list of file/directory names the can be found
         in a project root directory.
         """
-        if path == os.path.sep:
-            return ''
+        if path == "/" or path.endswith(":\\"):
+            return ""
         elif any(m in os.listdir(path) for m in root_markers):
             return path
         else:
