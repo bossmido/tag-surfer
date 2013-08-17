@@ -16,15 +16,16 @@ if  v:version < 703 || !has('python') || exists("g:tsurf_loaded") || &cp
     finish
 endif
 
-" The `sys` module is automatically imported by vim, check with
-" `:py print globals()`
-let s:current = pyeval("sys.version_info[0]")
-if s:current != 2
-    echohl WarningMsg |
-        \ echomsg "[tsurf] Tag Surfer unavailable: requires python 2.x" |
-        \ echohl None
+python << END
+current = sys.version_info[0]
+if current != 2:
+    print "[tsurf] Tag Surfer unavailable: requires python 2.x"
+    vim.command("let g:tsurf_unsupported_python = 1")
+END
+if exists("g:tsurf_unsupported_python")
     finish
 endif
+
 let g:tsurf_loaded = 1
 
 " On non-Windows plarforms, tell the user that he can have better search
