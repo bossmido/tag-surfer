@@ -6,7 +6,6 @@ tests.py
 Tests for tsurf.
 """
 
-from __future__ import division
 import unittest
 
 from tsurf.utils import search
