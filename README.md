@@ -21,8 +21,7 @@ and [http://en.wikipedia.org/wiki/Ctags](http://en.wikipedia.org/wiki/Ctags).
 Once you got familiar with Ctags and tags in general you can proceed with the installation:
 
 * **Windows:** At the [Ctags homepage](http://ctags.sourceforge.net) you can find a link to download a
-zipped file containig the *ctags* executable for Windows. Download it and put it where can be found in your `%PATH%` environment
-variable..
+zipped file containing the *ctags* executable for Windows. Download it and put it where can be found in your `%PATH%`.
 
 * **Linux:** Most distributions provide a package for *ctags* so you need to search for instructions specific
 to your distribution. Just be sure that once installed it can be found in your `$PATH`.
@@ -30,9 +29,9 @@ to your distribution. Just be sure that once installed it can be found in your `
 * **Mac OS:** On Mac OS you can find a preinstalled version of *ctags* but it's not what we are looking for
 because it's not *Exuberant Ctags*. I really hope you are using *homebrew* for managing your packages,
 so to get the newer version of *ctags* simly execute in your terminal:
-
-    brew install ctags
-
+```shell
+$ brew install ctags
+```
 
 ### Step 2. Install Tag Surfer
 
