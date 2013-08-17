@@ -52,17 +52,19 @@ fu! s:find_ctags_bin(bin)
     endif
     " Try to automatically discover Exuberant Ctags
     if has("win32")
-        " globpath() wants forward slashes even on Windows
+        " `globpath()` wants forward slashes even on Windows
         let places = split(substitute($PATH, '\', '/', 'g'), ";")
     else
-        let commons = ["/usr/local/bin", "/opt/local/bin", "/usr/bin"]
-        let places = extend(split($PATH, ":"), commons)
+        let places = extend(split($PATH, ":"),
+            \ ["/usr/local/bin", "/opt/local/bin", "/usr/bin"])
     endif
-    for bin in split(globpath(join(places, ","), a:bin), "\n")
-        let out = system(bin . " --version")
-        if v:shell_error == 0 && match(out, "Exuberant Ctags") != -1
-            return bin
-        endif
+    for bin in [a:bin, 'ctags', 'ctags-exuberant', 'exctags', 'ctags.exe']
+        for ctags in split(globpath(join(places, ","), bin), "\n")
+            let out = system(ctags . " --version")
+            if v:shell_error == 0 && match(out, "Exuberant Ctags") != -1
+                return ctags
+            endif
+        endfor
     endfor
     return a:bin
 endfu
@@ -77,7 +79,7 @@ let g:tsurf_debug =
 " Core options
 
 let g:tsurf_ctags_bin =
-    \ s:find_ctags_bin(get(g:, "tsurf_ctags_bin", has("win32") ? "ctags.exe" : "ctags"))
+    \ s:find_ctags_bin(get(g:, "tsurf_ctags_bin", ""))
 
 let g:tsurf_ctags_args =
     \ get(g:, "tsurf_ctags_args", "-f - --format=2 --excmd=pattern --sort=yes --extra= --fields=nKzmafilmsSt")
