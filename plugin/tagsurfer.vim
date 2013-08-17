@@ -113,7 +113,7 @@ let g:tsurf_current_line_indicator =
     \ get(g:, "tsurf_current_line_indicator", " > ")
 
 let g:tsurf_line_format =
-    \ get(g:, "tsurf_line_format", ["{file}", " | {line}", " | {kind}"])
+    \ get(g:, "tsurf_line_format", ["{file}", " | {kind}"])
 
 let g:tsurf_tag_file_full_path =
     \ get(g:, "tsurf_tag_file_full_path", 0)
