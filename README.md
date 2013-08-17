@@ -4,7 +4,7 @@ Tag search for the Vim editor.
 
 ## Installation
 
-First thing, check if your system meets these requirements:
+First thing, check if your system meets the following requirements:
 
 * Linux, Mac OS, Windows
 * Vim 7.3+ compiled with python 2.x
@@ -13,49 +13,54 @@ If the previos requirements are satisfied proceed with the following steps.
 
 ### Step 1. Install Exuberant Ctags
 
-If you have already installed Exuberant Ctags then you can safely skip this step. You can easily check
+If you have already installed *Exuberant Ctags* then you can safely skip this step. You can easily check
 if it is already installed executing in your terminal the command `ctags --version` (or `ctags-exuberant` on some systems)
 and if the name *Exuberant Ctags* appears somewhere then you're done and you can proceed with step 2.
-If you don't know what Exuberant Ctags is then you better have a look at [http://ctags.sourceforge.net](http://ctags.sourceforge.net)
-and [http://en.wikipedia.org/wiki/Ctags](http://en.wikipedia.org/wiki/Ctags) instead. 
+If you don't know what *Exuberant Ctags* is then you better have a look at [http://ctags.sourceforge.net](http://ctags.sourceforge.net)
+and [http://en.wikipedia.org/wiki/Ctags](http://en.wikipedia.org/wiki/Ctags). 
 Once you got familiar with Ctags and tags in general you can proceed with the installation:
 
-* **Windows** At the [ctags homepage](http://ctags.sourceforge.net) you can find the link to download a
-zipped file containig the *ctags* executable. Download it and put it where can be found via the %PATH% environment
-variable (I assume you already know how to to it).
+* **Windows:** At the [Ctags homepage](http://ctags.sourceforge.net) you can find a link to download a
+zipped file containig the *ctags* executable for Windows. Download it and put it where can be found in your `%PATH%` environment
+variable..
 
-* **Linux** Most distributions provide a package for *ctags* so you need to search for instruction specific
+* **Linux:** Most distributions provide a package for *ctags* so you need to search for instructions specific
 to your distribution. Just be sure that once installed it can be found in your `$PATH`.
 
-* P*Mac OS** Mac OS comes shipped with a preinstalled version of *ctags* but it's not what we are looking for
-because it's *Exuberant Ctags* but an older version. I hope really you are using *homebrew* for managing your packages,
-to get the newer cersion run `brew install ctags`.
+* **Mac OS:** On Mac OS you can find a preinstalled version of *ctags* but it's not what we are looking for
+because it's not *Exuberant Ctags*. I really hope you are using *homebrew* for managing your packages,
+so to get the newer version of *ctags* simly execute in your terminal:
+
+    brew install ctags
+
 
 ### Step 2. Install Tag Surfer
 
-After installing Exuberant Ctags, we can proceed with the installation of the Tag Surfer* plugin. 
-Copy the content of the *Tag Surfer* folder into your `~/.vim` directory (or `%USERPROFILE%/vimfiles` for Windows users)
-or use your favorite plugin manager, such as [Vundle](https://github.com/gmarik/vundle), 
-[Pathogen](https://github.com/tpope/vim-pathogen) or [Neobundle](https://github.com/Shougo/neobundle.vim).
+After installing *Exuberant Ctags*, we can proceed with the installation of the
+*Tag Surfer* plugin. Copy the content of the *Tag Surfer* folder into your 
+`~/.vim` directory or use your favorite plugin manager, such as 
+[Vundle](https://github.com/gmarik/vundle), [Pathogen](https://github.com/tpope/vim-pathogen) 
+or [Neobundle](https://github.com/Shougo/neobundle.vim).
 
-### Step3. [Only for non-Windows users] Compile the 'search' component 
+### Step3. Compile the 'search' component 
 
 I'm sorry but if you are a Windows user there is no support for compiling the 'search' 
-component on your system. This does not means Tag Surfer won't work but just that searches won't
-be as fast as with this component compiled.
+component on your system. This does not means that *Tag Surfer* won't work but just that 
+searches won't be as fast as with this component compiled.
   
-To complete the installation go to the folder where you have installed the plugin and execute:
+To complete the installation go to root folder the plugin and execute:
 
     $ ./complete-installation.sh
 
-This script will compile some files needed for the best search performances. 
+This script will compile some files needed for better search performances. 
 
-### Checkup
+### Last check
 
-If all went well now you are ready to use **Tag Surfer**. To test out the plugin, open a 
-source file and execute the `Tsurf` command. If all you see is a disheartening error message
-or just *nothing found...* then skip ahead to the *Common issues* section, otherwise, start
-enjoying the plugin or read further.
+If all went well now you are ready to use *Tag Surfer*. To test if the plugin 
+is woking, open a source file and execute the `Tsurf` command. If all you see 
+is a disheartening error message or just *nothing found...* then skip ahead
+to the *Common issues* section, otherwise, start enjoying the plugin or read 
+further.
 
 
 ## Quick start
@@ -113,7 +118,7 @@ or just to ask [questions](../../issues?labels=question&state=open)! There is al
 
 ## Credits
 
-See [this page](https://github.com/gcmt/tag-surfer/graphs/contributors) for all **Tag Surfer** contributors. 
+See [this page](https://github.com/gcmt/tag-surfer/graphs/contributors) for all *Tag Surfer* contributors. 
 
 
 ## Changelog
