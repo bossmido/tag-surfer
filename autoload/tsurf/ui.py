@@ -370,7 +370,7 @@ class Renderer:
 
         else:
 
-            v.set_buffer(settings.get("nothing_found_msg"))
+            v.set_buffer(settings.get("no_results_msg"))
             v.set_win_height(1)
             curr_line_idx = 0
 

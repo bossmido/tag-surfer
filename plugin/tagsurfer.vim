@@ -124,8 +124,8 @@ let g:tsurf_tag_file_full_path =
 let g:tsurf_tag_file_custom_depth =
     \ get(g:, "tsurf_tag_file_custom_depth", -1)
 
-let g:tsurf_nothing_found_msg =
-    \ get(g:, "tsurf_nothing_found_msg", " nothing found...")
+let g:tsurf_no_results_msg =
+    \ get(g:, "tsurf_no_results_msg", " nothing found...")
 
 
 " TODO: is it better to just use colorscheme-dependent colors ?
