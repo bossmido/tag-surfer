@@ -32,6 +32,15 @@ py_search(PyObject *self, PyObject *args)
     // that matches in `haystack` are word boundaries
     PyObject *boundaries = PyList_New(0);
 
+    // If `haystack` has only uppercase characters then it makes no sense
+    // to treat an uppercase letter as a word-boundary character
+    int uppercase_is_word_boundary = 0;
+    for (int i = 0; i < haystack_len; i++) {
+        char c = haystack[i];
+        if (c >= 97 && c <= 122)  // non-uppercase letter
+            uppercase_is_word_boundary = 1;
+    }
+
     PyObject *pos;
     int cond;
     int needle_idx = 0;
@@ -50,7 +59,7 @@ py_search(PyObject *self, PyObject *args)
         if (cond) {
             pos = Py_BuildValue("i", i);
             PyList_Append(positions, pos);
-            if (isupper(haystack[i]) || i == 0 || 
+            if ((uppercase_is_word_boundary && isupper(haystack[i])) || i == 0 || 
                 (i > 0 && (haystack[i-1] == '-' || haystack[i-1] == '_')))
                 PyList_Append(boundaries, pos);
             Py_DECREF(pos);

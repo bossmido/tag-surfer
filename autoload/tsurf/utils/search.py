@@ -28,6 +28,12 @@ def search(needle, haystack, smart_search):
     # that matches in `haystack` are word boundaries
     boundaries = []
 
+    # If `haystack` has only uppercase characters then it makes no sense
+    # to treat an uppercase letter as a word-boundary character
+    uppercase_is_word_boundary = True
+    if haystack.isupper():
+        uppercase_is_word_boundary = False
+
     needle_len = len(needle)
     needle_idx = 0
     for i in range(len(haystack)):
@@ -45,7 +51,8 @@ def search(needle, haystack, smart_search):
 
         if cond:
             positions.append(i)
-            if c.isupper() or i == 0 or (i > 0 and haystack[i-1] in ('-', '_')):
+            if (i == 0 or (uppercase_is_word_boundary and c.isupper()) or
+                (i > 0 and haystack[i-1] in ('-', '_'))):
                 boundaries.append(i)
             needle_idx += 1
 
