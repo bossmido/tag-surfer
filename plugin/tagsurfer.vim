@@ -127,17 +127,14 @@ let g:tsurf_tag_file_relative_to_project_root =
 let g:tsurf_no_results_msg =
     \ get(g:, "tsurf_no_results_msg", " nothing found...")
 
-
-" TODO: is it better to just use colorscheme-dependent colors ?
-
 let g:tsurf_shade_color =
-    \ get(g:, 'tsurf_shade_color', 'gui=NONE guifg=#999999 cterm=NONE ctermfg=245')
+    \ get(g:, 'tsurf_shade_color', 'Comment')
 
 let g:tsurf_shade_color_darkbg =
     \ get(g:, 'tsurf_shade_color_darkbg', g:tsurf_shade_color)
 
 let g:tsurf_matches_color =
-    \ get(g:, 'tsurf_matches_color', 'gui=NONE guifg=#ff6155 cterm=NONE ctermfg=203')
+    \ get(g:, 'tsurf_matches_color', 'WarningMsg')
 
 let g:tsurf_matches_color_darkbg =
     \ get(g:, 'tsurf_matches_color_darkbg', g:tsurf_matches_color)
