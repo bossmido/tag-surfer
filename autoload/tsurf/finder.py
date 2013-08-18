@@ -44,12 +44,7 @@ class Finder:
         # that we can delete it when a new one is generated.
         self.old_tagfile = ""
 
-        # Set the correct search function according to user settings
-        if settings.get("smart_matching", bool):
-            self._search = search.smart_search
-        else:
-            self._search = search.fuzzy_search
-
+        # Some stuff required by Windows
         self.startupinfo = None
         self.sanitize = lambda s: s
         if os.name == 'nt':
@@ -84,7 +79,7 @@ class Finder:
         for tag in tags:
             # If `input == ""` then everything matches. Note that if `input == ""`
             # the current search scope is just the current buffer.
-            score, positions = self._search(input, tag["name"])
+            score, positions = search.search(input, tag["name"], settings.get("smart_search", int))
             if positions or not input:
                 matches.append({
                     "match_positions": positions,

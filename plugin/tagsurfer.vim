@@ -90,8 +90,8 @@ let g:tsurf_ctags_args =
 
 " Search type and scope
 
-let g:tsurf_smart_matching =
-    \ get(g:, "tsurf_smart_matching", 0)
+let g:tsurf_smart_search =
+    \ get(g:, "tsurf_smart_search", 1)
 
 let g:tsurf_buffer_search_modifier =
     \ get(g:, "tsurf_buffer_search_modifier", "%")

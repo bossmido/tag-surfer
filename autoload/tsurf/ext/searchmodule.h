@@ -4,8 +4,6 @@
 #include <Python.h>
 #include <ctype.h>
 
-PyObject* _smart_search(const char*, int, const char*, int, int, int, PyObject*);
-
-float compute_score(const char*, PyObject*);
+float compute_score(const char*, PyObject*, PyObject*);
 
 #endif

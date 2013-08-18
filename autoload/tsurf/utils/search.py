@@ -3,132 +3,87 @@
 tsurf.utils.search
 ~~~~~~~~~~~~~~~~~~
 
-This module defines search functions used by the Finder class
+This module defines the search function used by the Finder class
 for searching tags that match the user search query.
 """
 
 from __future__ import division
 
 
-def fuzzy_search(needle, haystack):
-    """To returns the positions at which each character in `needle` matches
-    in `haystack`."""
-    if not needle:
-        return (-1, tuple())
+def search(needle, haystack, smart_search):
+    """To search for `needle` in `haystack`.
 
-    positions = []
-    for i, c in enumerate(haystack):
-        if not needle:
-            break
-        if c.lower() == needle[0].lower():
-            positions.append(i)
-            needle = needle[1:]
-
-    if not needle:
-        return (compute_score(haystack, positions), tuple(positions))
-    else:
-        return (-1, tuple())
-
-
-def smart_search(needle, haystack, start=-1, positions=None):
-    """To returns the positions at which each character in `needle` matches
-    in `haystack`.
-
-    How it works:
-
-      This function implements a mix of fuzzy and a naive
-      case-insensitive search.
-      A match can start everywhere and can be "splitted" among different
-      tokens. A token is:
-
-        - Any string subsequence tha starts at position 0.
-        - Any string subsequence that starts with an uppercase letter.
-        - Any string subsequence that starts after any of the
-          characters ' ', '_', '-', '.'
-
-    Examples:
-
-      >>> _match_positions("hello", "Hello world")
-      [0,1,2,3,4]  # [h][e][l][l][o] world
-
-      >>> _match_positions("hew", "HelloWorld")
-      [0,1,5]  # [H][e]llo[W]orld
-
-      >>> _match_positions("hwor", "Hello_world")
-      [0,6,7,8]  # [H]ello_[w][o][r]ld
-
-      >>> _match_positions("hor", "Hello_world")
-      []  # Hello_world
-
-      >>> _match_positions("llwo", "Hello world")
-      [2,3,6,7]  # He[l][l]o [w][o]rld
+    Returns a tuple of two elements: a number and another tuple.
+    The number is a measure of "how well" `needle` matches `haystack`.
+    the other tuple contains the positions where any character in
+    `needle` matches in `haystack`.
     """
-    if positions is None:
-        positions = []
-
-    if not needle or start >= len(haystack)-1:
+    if not needle:
         return (-1, tuple())
 
-    a_token_starts = True
-    last_successful_match = -1
-    _needle = needle
+    # `positions` is a list of positions where any characters in `needle`
+    # matches in `haystack`
+    positions = []
+    # `boundaries` is a list of positions where characters in `needle`
+    # that matches in `haystack` are word boundaries
+    boundaries = []
 
-    for i, c in enumerate(haystack):
-
-        if i <= start:
-            continue
-
-        if not _needle:
+    needle_len = len(needle)
+    needle_idx = 0
+    for i in range(len(haystack)):
+        if needle_idx == needle_len:
             break
 
-        if (c.lower() == _needle[0].lower()
-            and (not positions or i-1 in positions or a_token_starts)):
-            last_successful_match = i
+        c = haystack[i]
+
+        # smart search: consider the case only if the character of `needle`
+        # is uppercase
+        if smart_search and needle[needle_idx].isupper():
+            cond = c == needle[needle_idx]
+        else:
+            cond = c.lower() == needle[needle_idx].lower()
+
+        if cond:
             positions.append(i)
-            _needle = _needle[1:]
+            if c.isupper() or i == 0 or (i > 0 and haystack[i-1] in ('-', '_')):
+                boundaries.append(i)
+            needle_idx += 1
 
-        a_token_starts = False
-
-        # Note about the `not haystack.isupper()` check.
-        # This checks if `haystack` contains only uppercase letters.
-        # If this is the case, then we do not consider un upeprcase letter
-        # as the start of a new token.
-
-        cond1 = c in ('_', '-', '.')
-        cond2 = i < len(haystack)-1 and haystack[i+1].isupper()
-        if cond1 or (cond2 and not haystack.isupper()):
-            a_token_starts = True
-
-    if not _needle:
-        return (compute_score(haystack, positions), tuple(positions))
-    elif last_successful_match > -1:
-        return smart_search(needle, haystack, last_successful_match, positions)
+    if needle_idx == needle_len:
+        return (compute_score(haystack, positions, boundaries),
+                tuple(positions))
     else:
         return (-1, tuple())
 
 
-def compute_score(haystack, positions):
-    """To compute the score given the match positions and the haystack
-    string length. The lower the better."""
+def compute_score(haystack, positions, boundaries):
+    """To compute the score for a match. The lower the better.
+
+    Returns a number.
+    """
     if not positions:
         return -1
 
     n = 0
-    sum_diffs = 0
-    sum_positions = 0
+    diffs_sum = 0
+    positions_sum = 0
     # Generate all `positions` combinations for k = 2
-    len_pos = len(positions)
-    for i in range(len_pos):
-        sum_positions += positions[i]
-        for j in range(i, len_pos):
+    positions_len = len(positions)
+    for i in range(positions_len):
+        positions_sum += positions[i]
+        for j in range(i, positions_len):
             if i != j:
-                sum_diffs += abs(positions[i]-positions[j])
+                diffs_sum += abs(positions[i]-positions[j])
                 n += 1
 
-    ratio = len(haystack)/len_pos
+    len_ratio = len(haystack)/positions_len
+
+    boundaries_ratio = 0.1
+    if boundaries:
+        boundaries_ratio = len(boundaries)/len(haystack) + 0.1
 
     if n > 0:
-        return sum_diffs/n + sum_positions/len_pos + ratio
+        return (diffs_sum/n + positions_sum/positions_len + len_ratio) / boundaries_ratio
     else:
-        # This branch is executed when len(positions) == 1 (and `diffs` is empty)
-        return positions[0] + ratio
+        # This branch is executed when len(positions) == 1
+        return (positions[0] + len_ratio) / boundaries_ratio
