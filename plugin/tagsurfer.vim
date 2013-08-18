@@ -98,9 +98,6 @@ let g:tsurf_project_search_modifier =
 let g:tsurf_root_markers =
     \ extend(get(g:, 'tsurf_root_markers', []), ['.git', '.svn', '.hg', '.bzr', '_darcs'])
 
-let g:tsurf_project_search_ignore =
-    \ get(g:, 'tsurf_project_search_ignore', "") . &wildignore
-
 " Appearance
 
 let g:tsurf_max_results =

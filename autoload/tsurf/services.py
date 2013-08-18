@@ -40,10 +40,6 @@ class CurrentProjectService:
             cond1 = self.files_cache
             cond2 = cond1 and not self.files_cache[0].startswith(root)
             if not cond1 or cond2:
-                # Save and update the `wildignore` option
-                wildignore = vim.eval("&wildignore")
-                vim.command("set wig={}".format(
-                    settings.get("project_search_ignore")))
                 # Get all files for the current project. Note that the `glob()`
                 # function ignore everything that matches with any of the
                 # wildcards listed in the `wildignore` option.
@@ -52,8 +48,6 @@ class CurrentProjectService:
                 expr = os.path.join(root, "**").replace("\\", "/")
                 files = vim.eval('glob("{}")'.format(expr)).split("\n")
                 self.files_cache = files
-                # Restore the wildignore option
-                vim.command("set wig={}".format(wildignore))
             else:
                 files = self.files_cache
 
