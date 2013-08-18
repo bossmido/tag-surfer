@@ -12,6 +12,7 @@ import vim
 import shlex
 import tempfile
 import subprocess
+from itertools import imap
 from datetime import datetime
 from operator import itemgetter
 
@@ -154,10 +155,11 @@ class Finder:
             # We don't really want an error message when Tag Surfer is executed and no
             # files are available
             if files:
-                args = shlex.split("{} {} {}".format(
+                files = imap(lambda f: '"{}"'.format(f) if " " in f else f, files)
+                cmd = shlex.split("{} {} {}".format(
                     *(self.sanitize(s) for s in (bin, args, " ".join(files)))))
                 try:
-                    out, err = subprocess.Popen(args, universal_newlines=True,
+                    out, err = subprocess.Popen(cmd, universal_newlines=True,
                             stdout=subprocess.PIPE, stderr=subprocess.PIPE,
                             startupinfo=self.startupinfo).communicate()
                 except Exception as e:
