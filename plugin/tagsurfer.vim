@@ -16,13 +16,17 @@ if  v:version < 703 || !has('python') || exists("g:tsurf_loaded") || &cp
     finish
 endif
 
+" Check for the correct python version
 python << END
+import sys
 current = sys.version_info[0]
 if current != 2:
-    print "[tsurf] Tag Surfer unavailable: requires python 2.x"
     vim.command("let g:tsurf_unsupported_python = 1")
 END
 if exists("g:tsurf_unsupported_python")
+    echohl WarningMsg |
+        \ echomsg "[tsurf] Tag Surfer unavailable: requires python 2.x" |
+        \ echohl None
     finish
 endif
 
