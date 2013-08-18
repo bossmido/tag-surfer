@@ -388,9 +388,9 @@ class Renderer:
             bmod = settings.get("buffer_search_modifier")
 
             file = tag["file"].encode('utf-8')
+            root = self.plug.services.curr_project.get_root()
 
             if settings.get("tag_file_full_path", bool):
-                root = self.plug.services.curr_project.get_root()
                 if query.startswith(pmod) and root:
                     # The search scope is the current projet and the project
                     # root exists
@@ -400,6 +400,13 @@ class Renderer:
                     # The search scope is the current projet but there
                     # is no project root
                     return file.replace(os.path.expanduser("~"), "~")
+
+            # The user always wants the tag file displayed relative to the
+            # current project root
+            if settings.get("tag_file_relative_to_project_root", bool):
+                if root:
+                    f = file.replace(root, "")
+                    return f[1:] if f.startswith(os.path.sep) else f
 
             # If the `g:tsurf_tag_file_custom_depth` is set,
             # cut the path according its value
