@@ -402,10 +402,13 @@ class Renderer:
                     return file.replace(os.path.expanduser("~"), "~")
 
             # The user always wants the tag file displayed relative to the
-            # current project root
+            # current project root if it exists. Replacing the home with
+            # '~' may be needed for files outside the current project that
+            # are printed with the absolute path.
             if settings.get("tag_file_relative_to_project_root", bool):
                 if root:
-                    f = file.replace(root, "")
+                    f = file.replace(root, "").replace(
+                            os.path.expanduser("~"), "~")
                     return f[1:] if f.startswith(os.path.sep) else f
 
             # If the `g:tsurf_tag_file_custom_depth` is set,
