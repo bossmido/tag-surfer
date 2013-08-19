@@ -14,19 +14,28 @@ if it is already installed on your system with
 
     $ ctags --version. 
 
-If you don't see the *Exuberant Ctags* string somewhere in the ouput then you need to install it:
+If you don't see the *Exuberant Ctags* string somewhere in the ouput then you
+need to install it:
     
-* **Windows:** You can easily get the `ctags.exe` executable from [http://ctags.sourceforge.net](http://ctags.sourceforge.net).
-* **Linux:** You may want to check out specific instructions for your distribution.
-* **Mac:** Unfortunately, the *ctags* version that you may find under `/usr/bin` is outdated so you better get the new version simply using *homebrew* (`brew install ctags`). 
+* **Windows:** You can easily get the `ctags.exe` executable from
+[http://ctags.sourceforge.net](http://ctags.sourceforge.net).
 
-Just be sure that once installed, the *ctags* binary can be found in your `$PATH` (or `%PATH%` for Windows users). Usually *Tag Surfer* is able to locate the correct 
-*ctags* binary by himself. If this is not the case, simply set the option `g:tsurf_ctags_bin` in your `.vimrc`:   
+* **Linux:** You may want to check out specific instructions for your
+distribution.
+
+* **Mac:** Unfortunately, the *ctags* program that you may find under
+`/usr/bin` is outdated so you better get the new version using
+*homebrew* (`brew install ctags`). 
+
+Just be sure that once installed, the *ctags* executable can be found in your
+`$PATH` (or `%PATH%` for Windows users). Usually *Tag Surfer* is able to locate
+the correct *ctags* binary by himself. If this is not the case, set the 
+option `g:tsurf_ctags_bin` in your `.vimrc`:   
 
     let g:tsurf_ctags_bin = "/path/to/my/ctags"  
   
 **Step 3:** Copy the content of the *Tag Surfer* folder into your `~/.vim` 
-directory or use your favorite plugin manager, such as 
+directory or install the plugin with a plugin manager (recommended) such as
 [Vundle](https://github.com/gmarik/vundle), [Pathogen](https://github.com/tpope/vim-pathogen) 
 or [Neobundle](https://github.com/Shougo/neobundle.vim).
 
@@ -47,7 +56,8 @@ component compiled.
 Using *Tag Surfer* is straightforward. To search for tags in all loaded buffers
 execute the `:Tsurf` command. If all you see is a disheartening error message
 or just *nothing found...* then skip ahead to the *Common issues* section,
-otherwise, you can start to interact with search results with the following keys.
+otherwise, you can start to interact with search results with the following
+keys.
 
 * `UP`, `TAB`, `CTRL+K`: move up.
 * `DOWN`, `CTRL+J`: move down.
@@ -71,13 +81,6 @@ prepend to your search query. Below is list of all available modifiers:
 project. Note that a project root is assumed to be the one that contains 
 any of the file or directory names listed in the `g:om_root_markers` option 
 (by default these are `.git`, `.svn`, `.hg`, `.bzr` and `_darcs`).
-
-#### Two kinds of search
-
-*Tag Surfer* provides two kinds of search. By default the search is performed
-in a *fuzzy* fashion, but if you set the `g:om_smart_search` option to `1` you
-can rely on a more "word-aware" search. Try both and see which one fit best for
-you.
 
 #### Languages support
 
@@ -112,22 +115,26 @@ values for the `g:tsurf_types` option:
         \ }
     \}
 
+
 ## Commands
 
 #### :Tsurf
 
-This command opens the *Tag Surfer* window at the bottom of Vim.   
+This command opens the *Tag Surfer*.   
 See the *Quick start* section for how to interact with the search results list.
 
 #### :TsurfSetRoot
 
-Use this command when you want to specify a custom root for your project.  
-This command may be useful if your project root cannot be located with any of the markers in `g:tsurf_root_markers`.   
+Use this command when you want to specify a custom root for your project. This
+command may be useful if your project root cannot be located with any of the
+markers in `g:tsurf_root_markers`.
 
-Note that when you set a custom root for your project this will have always the precedence over the markers specified in `g:tsurf_root_markers`.
+If you run the command with no arguments the current working directory is used 
+(the one that is printed by the comamnd `:pwd`), otherwise you have to specify
+an absolute path (you can safely use `~` or `$HOME` for the home directory).  
 
-
-
+Note that when you set a custom root for your project this will have always the
+precedence over the markers specified in `g:tsurf_root_markers`.
 
 #### :TsurfUnsetRoot
 
@@ -139,16 +146,17 @@ command.
 
 #### g:tsurf\_ctags\_bin
 
-With this option you can set the path of the *ctags* binary on your system if *Tag Surfer* cannot locate it by himself.
+With this option you can set the path of the *ctags* binary on your system if
+*Tag Surfer* cannot locate it by himself.
 
 Default: `""`
 
 #### g:om\_smart\_search
 
-Set the this option to `1` if you prefer a more "word-aware" search. By default the search is performed in a *fuzzy* fashion. See the *Quick start* section
-for live examples.
+With this option you can customize the behavior of uppercase letters in your
+search query. If this option is set to `1` (which is by default), ...
 
-Default:  `0`
+Default:  `1`
 
 #### g:tsurf\_max\_results
 
@@ -179,34 +187,64 @@ list all kinds for every supported language)
 
 Default: `['{file}', '| {kind}']` 
 
-#### g:om\_root\_markers
-
-This option is a list containing file or directory names used by *Tag Surfer* to locate
-the current project root. Note that these have no precedence over a custom root that 
-may have been set with the `:TsurfSetRoot` command.
-
-Default:  `['.git', '.svn', '.hg', '.bzr', '_darcs']`
-
 #### g:tsurf\_tag\_file\_full\_path
 
 With this option you can decide whether or not the full path will be displayed
-for the attribute `{file}` in the option `g:tsurf_line_format`. Note that, when possible, `$HOME` is substituted by `~` and if you are in a project whose root has been located (either via `g:tsurf_root_markers` or the `:TsurfSetRoot` command) all the paths will be relative to the current project root.
+for the attribute `{file}` in the option `g:tsurf_line_format`. Note that, when
+possible, `$HOME` is substituted by `~` and if you are in a project whose root
+has been located (either via `g:tsurf_root_markers` or the `:TsurfSetRoot`
+command) all the paths will be relative to the current project root.
 
 Default: `0`
 
 #### g:tsurf\_tag\_file\_custom\_depth
 
 With this option you can decide how many directory levels will be displayed for
-the attribute `{file}` in the option `g:tsurf_line_format`. For example, if you set the value `2` for this option you'll end up with paths such as `container/file.vim`. Note that when `g:tsurf_tag_file_full_path == 1` this option is simply ignored.
+the attribute `{file}` in the option `g:tsurf_line_format`. For example, if you
+set the value `2` for this option you'll end up with paths such as
+`container/file.vim`. Note that when `g:tsurf_tag_file_full_path == 1` this
+option is simply ignored.
 
 Default: `-1` (the whole path is displayed)
 
 #### g:tsurf\_tag\_file\_relative\_to\_project\_root
 
-Set this option to `1` and paths value for the attribute `{file}` in the option `g:tsurf_line_format` will always be relative to the project root when you perform
-project-wide searches, even if `g:tsurf_tag_file_custom_depth > 1`. Note that this behavior is default when `g:tsurf_tag_file_full_path == 1`.
+Set this option to `1` and paths value for the attribute `{file}` in the option
+`g:tsurf_line_format` will always be relative to the project root when you
+perform project-wide searches, even if `g:tsurf_tag_file_custom_depth > 1`.
+Note that this behavior is default when `g:tsurf_tag_file_full_path == 1`.
 
 Default: `1`
+
+#### g:tsurf\_languages
+
+With this option you can add support for languages not supported by *ctags* and
+add some filetype-specifi filters. See the *Quick start* section for how to set
+this option.
+
+Default: `{}`
+
+#### g:tsurf\_root\_markers
+
+This option is a list containing file or directory names used by *Tag Surfer*
+to locate the current project root. Note that these have no precedence over
+a custom root that may have been set with the `:TsurfSetRoot` command.
+
+Default:  `['.git', '.svn', '.hg', '.bzr', '_darcs']`
+
+#### g:tsurf\_buffer\_search\_modifier
+
+With this option you can set the modifier used to narrow the search scope
+to the current buffer.
+
+Default: `"%"`
+
+#### g:tsurf\_project\_search\_modifier
+
+With this option you can set the modifier used to widen the search scope
+to the current buffer.
+
+Default: `"#"`
 
 #### g:tsurf\_prompt
 
@@ -217,8 +255,9 @@ Default: `" @ "`
 #### g:tsurf\_prompt\_color
 
 With this option you can set the color for the prompt. As values, you can use
-names of previously defined highlight groups, such as `String`, `Question` and so on. Yo can execute the vim command `:hi` to
-see all defined highlight groups.
+names of previously defined highlight groups, such as `String`, `Question`,
+etc. Yo can execute the vim command `:hi` to see all defined highlight
+groups.
 
 Default: `"None"` (no color)
 
@@ -240,51 +279,67 @@ Default: `" nothing found..."`
 
 #### g:tsurf\_shade\_color
 
-With this option you can define the color used to highlight everything that is not the tag name and the current line indicator in the search results window. As values, you can use previously defined highlight groups, such as `String`, `Comment`, etc.. or full-fledged color declarations as you would do when defining your own highlight group (as you can see in the default argument).
+With this option you can define the color used to highlight everything that is
+not the tag name and the current line indicator in the search results window.
+As values, you can use previously defined highlight groups, such as `String`,
+`Comment`, etc.. or full-fledged color declarations as you would do when
+defining your own highlight group (as you can see in the default argument).
 see in the default argument).
 
 Examples:
+
 ```vim
+" example 1
 let g:tsurf_shade_color = "gui=NONE guifg=#999999 cterm=NONE ctermfg=245"
-```
-```vim
+
+" example 2
 hi MyHighlightGroup gui=NONE guifg=#999999 cterm=NONE ctermfg=245
 let g:tsurf_shade_color = "MyHighlightGroup" 
-```
-```vim
+
+" example 3
 let g:tsurf_shade_color = "String" 
 ```
-Default: `Comment`
+
+Default: `"Comment"`
 
 #### g:tsurf\_shade\_color\_darkbg
 
-With this option you can define the color used to highlight everything that is not the tag name and the current line indicator in the search results window when the current background is *dark* (`&backgroud == "dark"`). As values, you can use previously defined highlight groups, such as `String`, `Comment`, etc.. or full-fledged color declarations as you would do when defining your own highlight group.
-
+This option behaves as the `g:tsurf_shade_color` option but this one is used
+when the current background is *dark* (`&backgroud == "dark"`).
+  
 See the `g:tsurf_shade_color` option for examples.
 
 Default: `< the value of g:tsurf_shade_color >`
 
 #### g:tsurf\_matches\_color
 
-With this option you can define the color used to highlight every single character that match your search query for each result. As values, you can use previously defined highlight groups, such as `String`, `Comment`, etc.. or full-fledged color declarations as you would do when defining your own highlight group (as you can see in the default argument).
+With this option you can define the color used to highlight every single
+character that match your search query for each result. As values, you can use
+previously defined highlight groups, such as `String`, `Comment`, etc.. or
+full-fledged color declarations as you would do when defining your own
+highlight group (as you can see in the default argument).
    
 Examples:
+
 ```vim
+" example 1
 let g:tsurf_matches_color = "gui=NONE guifg=#ff6155 cterm=NONE ctermfg=203"
-```
-```vim
+
+" example 2
 hi MyHighlightGroup gui=NONE guifg=#ff6155 cterm=NONE ctermfg=203
 let g:tsurf_matches_color = "MyHighlightGroup" 
-```
-```vim
+
+" example 3
 let g:tsurf_matches_color = "String" 
 ```
-Default: `WarningMsg`
+
+Default: `"WarningMsg"`
 
 #### g:tsurf\_matches\_color\_darkbg
 
-With this option you can define the color used to highlight every single character that match your search query for each result when the current background is *dark* (`&backgroud == "dark"`). As values, you can use previously defined highlight groups, such as `String`, `Comment`, etc.. or full-fledged color declarations as you would do when defining your own highlight group.
-
+This option behaves as the `g:tsurf_matches_color` option but this one is used
+when the current background is *dark* (`&backgroud == "dark"`).
+  
 See the `g:tsurf_matches_color` option for examples.
 
 Default: `< the value of g:tsurf_matches_color >`
@@ -312,7 +367,7 @@ See [this page](https://github.com/gcmt/tag-surfer/graphs/contributors) for all
 
 ## Changelog
 
-See [CHANGELOG.txt](CHANGELOG.txt).
+See [CHANGELOG.md](CHANGELOG.md).
 
 
 ## License
