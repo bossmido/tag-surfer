@@ -10,6 +10,7 @@ This module defines the TagSurfer class. This class serve two purpose:
 
 """
 
+import os
 import vim
 
 from tsurf import ui
@@ -35,6 +36,11 @@ class TagSurfer:
     def SetProjectRoot(self, root=""):
         """To set the current project root to the current working directory or
         to the directory passed as argument."""
+        home = os.path.expanduser("~")
+        if root.startswith("~"):
+            root = root.replace("~", home)
+        elif root.startswith("$HOME"):
+            root = root.replace("$HOME", home)
         self.services.curr_project.set_root(
                 root if root else vim.eval("getcwd()"))
 
