@@ -14,9 +14,9 @@ def search(needle, haystack, smart_search):
     """To search for `needle` in `haystack`.
 
     Returns a tuple of two elements: a number and another tuple.
-    The number is a measure of "how well" `needle` matches `haystack`.
-    the other tuple contains the positions where any character in
-    `needle` matches in `haystack`.
+    The number is a measure of the similarity between `needle` and `haystack`,
+    whereas the other tuple contains the positions where the match occurs in
+    `haystack`.
     """
     if not needle:
         return (-1, tuple())
@@ -24,9 +24,9 @@ def search(needle, haystack, smart_search):
     # `positions` is a list of positions where any characters in `needle`
     # matches in `haystack`
     positions = []
-    # `boundaries` is a list of positions where characters in `needle`
-    # that matches in `haystack` are word boundaries
-    boundaries = []
+    # `boundaries` is the count of how many characters in `positions`
+    # are word boundaries
+    boundaries_count = 0
 
     # If `haystack` has only uppercase characters then it makes no sense
     # to treat an uppercase letter as a word-boundary character
@@ -53,20 +53,22 @@ def search(needle, haystack, smart_search):
             positions.append(i)
             if (i == 0 or (uppercase_is_word_boundary and c.isupper()) or
                 (i > 0 and haystack[i-1] in ('-', '_'))):
-                boundaries.append(i)
+                boundaries_count += 1
             needle_idx += 1
 
     if needle_idx == needle_len:
-        return (compute_score(haystack, positions, boundaries),
+        return (similarity(haystack, positions, boundaries_count),
                 tuple(positions))
     else:
         return (-1, tuple())
 
 
-def compute_score(haystack, positions, boundaries):
-    """To compute the score for a match. The lower the better.
+def similarity(haystack, positions, boundaries_count):
+    """ To compute the similarity between two strings given `haystack` and the
+    positions where `needle` matches in `haystack`.
 
-    Returns a number.
+    Returns a number that indicate the similarity between the two strings.
+    The lower it is, the more similar the two strings are.
     """
     if not positions:
         return -1
@@ -84,13 +86,11 @@ def compute_score(haystack, positions, boundaries):
                 n += 1
 
     len_ratio = len(haystack)/positions_len
-
-    boundaries_ratio = 0.1
-    if boundaries:
-        boundaries_ratio = len(boundaries)/len(haystack) + 0.1
+    if boundaries_count:
+        len_ratio /= (boundaries_count + 1)
 
     if n > 0:
-        return (diffs_sum/n + positions_sum/positions_len + len_ratio) / boundaries_ratio
+        return diffs_sum/n + positions_sum/positions_len + len_ratio
     else:
         # This branch is executed when len(positions) == 1
-        return (positions[0] + len_ratio) / boundaries_ratio
+        return positions[0] + len_ratio

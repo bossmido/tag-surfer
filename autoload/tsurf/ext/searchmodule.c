@@ -8,6 +8,11 @@
 #include "searchmodule.h"
 
 
+static char py_search_doc[] = "To search for `needle` in `haystack`.\n"
+    "Returns a tuple of two elements: a number and another tuple."
+    "The number is a measure of the similarity between `needle` and `haystack`,"
+    "whereas the other tuple contains the positions where the match occurs in `haystack`.";
+
 static PyObject *
 py_search(PyObject *self, PyObject *args)
 {
@@ -28,9 +33,9 @@ py_search(PyObject *self, PyObject *args)
     // `positions` is a list of positions where any characters in `needle`
     // matches in `haystack`
     PyObject *positions = PyList_New(0);
-    // `boundaries` is a list of positions where characters in `needle`
-    // that matches in `haystack` are word boundaries
-    PyObject *boundaries = PyList_New(0);
+    // `boundaries_count` is the count of how many characters in `positions`
+    // are word boundaries
+    int boundaries_count = 0;
 
     // If `haystack` has only uppercase characters then it makes no sense
     // to treat an uppercase letter as a word-boundary character
@@ -59,21 +64,21 @@ py_search(PyObject *self, PyObject *args)
         if (cond) {
             pos = Py_BuildValue("i", i);
             PyList_Append(positions, pos);
+
             if ((uppercase_is_word_boundary && isupper(haystack[i])) || i == 0 || 
                 (i > 0 && (haystack[i-1] == '-' || haystack[i-1] == '_')))
-                PyList_Append(boundaries, pos);
+                boundaries_count++;
+
             Py_DECREF(pos);
             needle_idx++;
         }
     }
 
     if (needle_idx == needle_len) {
-        PyObject *pos = PySequence_Tuple(positions);
+        PyObject *tpos = PySequence_Tuple(positions);
         Py_DECREF(positions);
-        PyObject* res = Py_BuildValue("(f,N)", 
-                compute_score(haystack, pos, boundaries), pos);
-        Py_DECREF(boundaries);
-        return res;
+        return Py_BuildValue("(f,N)", 
+                similarity(haystack, tpos, boundaries_count), tpos);
     } else {
         // no match
         return Py_BuildValue("(i,())", -1);
@@ -82,7 +87,7 @@ py_search(PyObject *self, PyObject *args)
 
 
 float 
-compute_score(const char *haystack, PyObject *positions, PyObject *boundaries) 
+similarity(const char *haystack, PyObject *positions, int boundaries_count) 
 {
     Py_ssize_t positions_len = PyTuple_Size(positions);
     if (positions_len == 0)
@@ -105,29 +110,21 @@ compute_score(const char *haystack, PyObject *positions, PyObject *boundaries)
         }
     }             
 
-    Py_ssize_t boundaries_len = PyList_Size(boundaries);
-    int boundaries_sum = 0;
-    for (int i = 0; i < boundaries_len; i++) {
-        boundaries_sum += PyFloat_AsDouble(PyList_GetItem(boundaries, i));
-    }
-    float boundaries_ratio = 0.1;
-    if (boundaries_len)
-        boundaries_ratio = boundaries_len*1.0/strlen(haystack) + 0.1;
-
     float len_ratio = strlen(haystack)*1.0 / positions_len;    
+    if (boundaries_count)
+        len_ratio /= (boundaries_count + 1);
 
     if (n > 0) {
-        return (diffs_sum*1.0/n + positions_sum*1.0/positions_len + len_ratio) / boundaries_ratio;
+        return diffs_sum*1.0/n + positions_sum*1.0/positions_len + len_ratio;
     } else {
         // `positions_len == 1`
-        return (PyFloat_AsDouble(PyTuple_GetItem(positions, 0)) + len_ratio) / boundaries_ratio;
+        return PyFloat_AsDouble(PyTuple_GetItem(positions, 0)) + len_ratio;
     }
 }
 
 
 static PyMethodDef searchMethods[] = {
-    {"search", py_search, METH_VARARGS,
-    "To return 'match score' and the positions at which `needle` matches in `haystack`."},
+    {"search", py_search, METH_VARARGS, py_search_doc},
     {NULL, NULL, 0, NULL}
 };
 
