@@ -24,8 +24,6 @@ def echohl(msg, hlgroup):
 
 def cwd():
     """To return the current buffer directory if exists."""
-    if vim.current.buffer.name:
-        return os.path.dirname(vim.current.buffer.name)
     return vim.eval('getcwd()')
 
 
