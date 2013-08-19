@@ -102,6 +102,11 @@ let g:tsurf_project_search_modifier =
 let g:tsurf_root_markers =
     \ extend(get(g:, 'tsurf_root_markers', []), ['.git', '.svn', '.hg', '.bzr', '_darcs'])
 
+" Custom languages support
+
+let g:tsurf_languages =
+    \ get(g:, "tsurf_languages", {})
+
 " Appearance
 
 let g:tsurf_max_results =
@@ -142,11 +147,6 @@ let g:tsurf_matches_color =
 
 let g:tsurf_matches_color_darkbg =
     \ get(g:, 'tsurf_matches_color_darkbg', g:tsurf_matches_color)
-
-" Custom languages support
-
-let g:tsurf_types =
-    \ get(g:, "tsurf_types", {})
 
 
 " Commands

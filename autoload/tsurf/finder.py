@@ -186,13 +186,13 @@ class Finder:
 
     def _get_type_specific_settings(self, ft):
         """To get type specific binary and relative arguments."""
-        types = settings.get("types")
-        if ft in types:
+        langs = settings.get("languages")
+        if ft in langs:
             return (
-                types[ft].get("bin", settings.get("ctags_bin")),
-                types[ft].get("args", settings.get("ctags_args")),
-                types[ft].get("kinds_map", {}),
-                dict((k, True) for k in types[ft].get("exclude_kinds", []))
+                langs[ft].get("bin", settings.get("ctags_bin")),
+                langs[ft].get("args", settings.get("ctags_args")),
+                langs[ft].get("kinds_map", {}),
+                dict((k, True) for k in langs[ft].get("exclude_kinds", []))
             )
         else:
             return (
