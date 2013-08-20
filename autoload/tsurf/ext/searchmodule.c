@@ -120,7 +120,7 @@ py_search(PyObject *self, PyObject *args)
     }
 
     PyObject *best_positions = NULL;
-    float best_similarity = .0;
+    float best_similarity = INT_MAX;
 
     Py_ssize_t possible_matches_len = PyList_Size(possible_matches);
     for (int i = 0; i < possible_matches_len; i++) {
@@ -139,15 +139,10 @@ py_search(PyObject *self, PyObject *args)
             int boundaries_count = PyInt_AsLong(
                     PyDict_GetItemString(match, "boundaries_count"));
 
-            if (best_positions == NULL) {
-                best_positions = positions; 
-                best_similarity = similarity(haystack, positions, boundaries_count);
-            } else {
-                float s = similarity(haystack, positions, boundaries_count);
-                if (s < best_similarity) {
-                    best_positions = positions;
-                    best_similarity = s;
-                }
+            float s = similarity(haystack, positions, boundaries_count);
+            if (s < best_similarity) {
+                best_positions = positions;
+                best_similarity = s;
             }
         }
     }
