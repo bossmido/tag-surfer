@@ -47,7 +47,7 @@ def search(needle, haystack, smart_search):
             if not possible_match["needle"]:
                 continue
 
-            if match(c, match["needle"][0], smart_search):
+            if match(c, possible_match["needle"][0], smart_search):
 
                 possible_match["positions"].append(i)
 
