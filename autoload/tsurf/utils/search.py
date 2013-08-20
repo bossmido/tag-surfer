@@ -17,16 +17,12 @@ def search(needle, haystack, smart_search):
     The number is a measure of the similarity between `needle` and `haystack`,
     whereas the other tuple contains the positions where the match occurs in
     `haystack`.
+
+    If there are multiple matches, the one with the highest similarity
+    (lowest value) is returned.
     """
     if not needle:
         return (-1, tuple())
-
-    # `positions` is a list of positions where any characters in `needle`
-    # matches in `haystack`
-    positions = []
-    # `boundaries` is the count of how many characters in `positions`
-    # are word boundaries
-    boundaries_count = 0
 
     # If `haystack` has only uppercase characters then it makes no sense
     # to treat an uppercase letter as a word-boundary character
@@ -34,33 +30,50 @@ def search(needle, haystack, smart_search):
     if haystack.isupper():
         uppercase_is_word_boundary = False
 
-    needle_len = len(needle)
-    needle_idx = 0
-    for i in range(len(haystack)):
-        if needle_idx == needle_len:
-            break
+    # `possible_matches` keeps track of all possible matches of `needle`
+    # along `haystack`
+    possible_matches = []
 
-        c = haystack[i]
+    for i, c in enumerate(haystack):
 
-        # smart search: consider the case only if the character of `needle`
-        # is uppercase
-        if smart_search and needle[needle_idx].isupper():
-            cond = c == needle[needle_idx]
-        else:
-            cond = c.lower() == needle[needle_idx].lower()
+        # add a new active match if we encounter along `haystack`
+        # a possible "start of match" for `needle`
+        if match(c, needle[0], smart_search):
+            possible_matches.append(
+                {"needle": needle, "positions": [], "boundaries_count": 0})
 
-        if cond:
-            positions.append(i)
-            if (i == 0 or (uppercase_is_word_boundary and c.isupper()) or
-                (i > 0 and haystack[i-1] in ('-', '_'))):
-                boundaries_count += 1
-            needle_idx += 1
+        for possible_match in possible_matches:
 
-    if needle_idx == needle_len:
-        return (similarity(haystack, positions, boundaries_count),
-                tuple(positions))
+            if not possible_match["needle"]:
+                continue
+
+            if match(c, match["needle"][0], smart_search):
+
+                possible_match["positions"].append(i)
+
+                if (i == 0 or (uppercase_is_word_boundary and c.isupper()) or
+                    (i > 0 and haystack[i-1] in ('-', '_'))):
+                    possible_match["boundaries_count"] += 1
+
+                possible_match["needle"] = possible_match["needle"][1:]
+
+    matches = filter(lambda m: not m["needle"], possible_matches)
+    if matches:
+        return min((similarity(haystack, m["positions"], m["boundaries_count"]), tuple(m["positions"]))
+                    for m in matches)
     else:
         return (-1, tuple())
+
+
+def match(c1, c2, smart_search):
+    """To check if the two characters `c1` and `c2` are equals.
+
+    smart_search == True: consider the case only if `c2` is uppercase.
+    """
+    if smart_search and c2.isupper():
+        return c1 == c2
+    else:
+        return c1.lower() == c2.lower()
 
 
 def similarity(haystack, positions, boundaries_count):
@@ -75,11 +88,9 @@ def similarity(haystack, positions, boundaries_count):
 
     n = 0
     diffs_sum = 0
-    positions_sum = 0
     # Generate all `positions` combinations for k = 2
     positions_len = len(positions)
     for i in range(positions_len):
-        positions_sum += positions[i]
         for j in range(i, positions_len):
             if i != j:
                 diffs_sum += abs(positions[i]-positions[j])
@@ -90,7 +101,7 @@ def similarity(haystack, positions, boundaries_count):
         len_ratio /= (boundaries_count + 1)
 
     if n > 0:
-        return diffs_sum/n + positions_sum/positions_len + len_ratio
+        return diffs_sum/n + len_ratio
     else:
         # This branch is executed when len(positions) == 1
         return positions[0] + len_ratio

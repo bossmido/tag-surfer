@@ -429,7 +429,7 @@ class Renderer:
             """Format debug information."""
             if settings.get("debug", bool):
                 return  " | debug: ({:.4f}|{})".format(
-                    tag["score"], tag["match_positions"])
+                    tag["similarity"], tag["match_positions"])
             return ""
 
         def get_linenr(tag):

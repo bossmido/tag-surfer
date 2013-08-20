@@ -79,11 +79,12 @@ class Finder:
         for tag in tags:
             # If `input == ""` then everything matches. Note that if `input == ""`
             # the current search scope is just the current buffer.
-            score, positions = search.search(input, tag["name"], settings.get("smart_search", int))
+            similarity, positions = search.search(
+                    input, tag["name"], settings.get("smart_search", int))
             if positions or not input:
                 matches.append({
                     "match_positions": positions,
-                    "score": score,
+                    "similarity": similarity,
                     "name": tag["name"],
                     "file": tag["file"],
                     "excmd": tag["excmd"],
@@ -103,8 +104,8 @@ class Finder:
             vim.command("setl stl={}".format(s.replace(" ", "\ ").replace("|", "\|")))
 
         if input:
-            # Sort by score
-            keyf = itemgetter("score")
+            # Sort by similarity
+            keyf = itemgetter("similarity")
         else:
             if len(matches) and (matches[0]["exts"].get("line") or matches[0]["excmd"].isdigit()):
                 # If a line number is available for locating the tags, then sort

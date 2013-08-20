@@ -4,6 +4,16 @@
 #include <Python.h>
 #include <ctype.h>
 
+
+/*
+ * To check if the two character c1 and c2 are equals.
+ *
+ * If the last argument == 1, the case is considered only if `c2` is uppercase.
+ *
+ */
+int match(char, char, int); 
+
+
 /*
  * To compute the similarity between two strings given `haystack` and the 
  * positions where `needle` matches in `haystack`.
