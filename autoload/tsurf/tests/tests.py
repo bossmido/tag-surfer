@@ -25,36 +25,41 @@ class TestSearch(unittest.TestCase):
 
         self.search_tests = {
             ("whatever", "") : (-1, tuple()),
-            ("whatever", "what") : (-1, tuple()),
-            ("", "superLong_identifier") : (-1, tuple()),
-            ("noticl", "superLong_identifier") : (-1, tuple()),
-            ("sup", "superLong_identifier") : (5.6667, (0,1,2)),
-            ("sul", "superLong_identifier") : (7.5556, (0,1,5)),
-            ("sui", "superLong_identifier") : (12.5556, (0,1,10)),
-            ("sud", "superLong_identifier") : (14.6667, (0,1,11)),
-            ("peri", "superLong_identifier") : (11.4167, (2,3,4,10)),
-            ("pong", "superLong_identifier") : (13.9167, (2,6,7,8)),
-            ("plong", "superLong_identifier") : (10.4000, (2,5,6,7,8)),
+            ("whatever", "androidManifest") : (-1, tuple()),
+            ("", "androidManifest") : (-1, tuple()),
+            ("am", "androidManifest") : (9.5, (0,7)),
+            ("ma", "androidManifest") : (4.75, (7,8)),
+            ("ama", "androidManifest") : (7, (0,7,8)),
+            ("aMa", "androidManifest") : (7, (0,7,8)),
+            ("amA", "androidManifest") : (7, (0,7,8)),
+            ("man", "androidManifest") : (3.8333, (7,8,9)),
+            ("ani", "androidManifest") : (5.8333, (0,1,5)),
+            ("anif", "androidManifest") : (5.4167, (8,9,10,11)),
+            ("ai", "androidManifest") : (8.75, (0,5)),
+            ("aif", "androidManifest") : (7, (8,10,11)),
         }
 
         self.smart_search_tests = {
-            ("whatever", "") : (-1, tuple()),
-            ("whatever", "what") : (-1, tuple()),
-            ("", "superLong_identifier") : (-1, tuple()),
-            ("noticl", "superLong_identifier") : (-1, tuple()),
-            ("sup", "superLong_identifier") : (5.6667, (0,1,2)),
-            ("suP", "superLong_identifier") : (-1, tuple()),
-            ("sul", "superLong_identifier") : (7.5556, (0,1,5)),
-            ("suL", "superLong_identifier") : (7.5556, (0,1,5)),
-            ("sud", "superLong_identifier") : (14.6667, (0,1,11)),
-            ("plong", "superLong_identifier") : (10.4000, (2,5,6,7,8)),
-            ("pLong", "superLong_identifier") : (10.4000, (2,5,6,7,8)),
-            ("pLOng", "superLong_identifier") : (-1, tuple()),
+            ("", "androidManifest_Smart") : (-1, tuple()),
+            ("am", "androidManifest_Smart") : (10.5, (0,7)),
+            ("ma", "androidManifest_Smart") : (6.25, (7,8)),
+            ("mar", "androidManifest_Smart") : (8.3333, (17,18,19)),
+            ("ama", "androidManifest_Smart") : (7.6667, (0,7,8)),
+            ("aMa", "androidManifest_Smart") : (7.6667, (0,7,8)),
+            ("amA", "androidManifest_Smart") : (-1, tuple()),
+            ("aMA", "androidManifest_Smart") : (-1, tuple()),
+            ("ams", "androidManifest_Smart") : (11, (0,7,13)),
+            ("amS", "androidManifest_Smart") : (12.4167, (0,7,16)),
+            ("man", "androidManifest_Smart") : (4.8333, (7,8,9)),
+            ("ani", "androidManifest_Smart") : (6.8333, (0,1,5)),
+            ("anif", "androidManifest_Smart") : (6.9167, (8,9,10,11)),
+            ("ai", "androidManifest_Smart") : (10.25, (0,5)),
+            ("aif", "androidManifest_Smart") : (9, (8,10,11)),
         }
 
     def test__search(self):
         for (needle, haystack), expected in self.search_tests.items():
-            score, positions = search.search(needle, haystack, True)
+            score, positions = search.search(needle, haystack, False)
             self.assertAlmostEqual(score, expected[0], 4)
             self.assertEqual(positions, expected[1])
 
@@ -66,7 +71,7 @@ class TestSearch(unittest.TestCase):
 
     def test__search_ext(self):
         for (needle, haystack), expected in self.search_tests.items():
-            score, positions = _search.search(needle, haystack, True)
+            score, positions = _search.search(needle, haystack, False)
             self.assertAlmostEqual(score, expected[0], 4)
             self.assertEqual(positions, expected[1])
 
