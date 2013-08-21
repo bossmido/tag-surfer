@@ -190,7 +190,7 @@ similarity(int haystack_len, PyObject *positions, int boundaries_count)
 
     int n = 0;
     float diffs_sum = .0;
-    int contiguous_sets = 0;
+    int contiguous_sets = positions_len == 1 ? 1 : 0;
 
     // Generate all `positions` combinations for k = 2 and
     // sum the absolute difference computed for each one.
