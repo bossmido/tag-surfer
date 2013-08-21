@@ -95,12 +95,14 @@ a *ctags-compatible* program that can generate tags for that language. *Tag
 Surfer* provides the `g:tsurf_types` option for integrating a custom
 *ctags-compatible* program fo non-supported languages:
 
-    let g:tsurf_types = {
-        "<filetype>" : {
-            \ "bin": "<path to the custom ctags-compatible program>",
-            \ "args": "<arguments for the custom ctags-compatible program>",
-        \ }
-    \}
+```vim
+let g:tsurf_types = {
+    \ "<filetype>" : {
+        \ "bin": "<path to the custom ctags-compatible program>",
+        \ "args": "<arguments for the custom ctags-compatible program>",
+    \ }
+\}
+```
 
 In order to make things work you have to be sure that the output of the custom
 *ctags-compatible* program is be **sorted** and redirected to **stdout**, so
@@ -111,7 +113,7 @@ values for the `g:tsurf_types` option:
 
 ```vim
 let g:tsurf_types = {
-    "<filetype>" : {
+    \ "<filetype>" : {
         \ "exclude_kinds": {"constant", "variable"}
     \ }
 \}
@@ -124,7 +126,7 @@ results for files with filetype `<filetype>`.
 
 ```vim
 let g:tsurf_types = {
-    "<filetype>" : {
+    \ "<filetype>" : {
         \ "kinds_map": {"c":"constant", "v":"variable"}
     \ }
 \}
