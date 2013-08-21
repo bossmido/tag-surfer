@@ -3,26 +3,17 @@
 
 #include <Python.h>
 #include <ctype.h>
-#include <limits.h>
 
 
 /*
- * To check if the two character c1 and c2 are equals.
- *
- * If the last argument == 1, the case is considered only if `c2` is uppercase.
- *
- */
-int match(char, char, int); 
-
-
-/*
- * To compute the similarity between two strings given `haystack` and the 
- * positions where `needle` matches in `haystack`.
+ * To compute the similarity between two strings given the `haystack` length,
+ * and the positions where `needle` matches in `haystack` and the positions
+ * where matches fall on word boundaries.
  *
  * Returns a number that indicate the similarity between the two strings.
  * The lower it is, the more similar the two strings are.
  *
  */
-float similarity(const char*, PyObject*, int);
+float similarity(int, PyObject*, int);
 
 #endif

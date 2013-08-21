@@ -22,7 +22,7 @@ def search(needle, haystack, smart_search):
     (lowest value) is returned.
     """
     if not needle:
-        return (-1, tuple())
+        return -1, tuple()
 
     # If `haystack` has only uppercase characters then it makes no sense
     # to treat an uppercase letter as a word-boundary character
@@ -30,53 +30,72 @@ def search(needle, haystack, smart_search):
     if haystack.isupper():
         uppercase_is_word_boundary = False
 
-    # `possible_matches` keeps track of all possible matches of `needle`
+    # `matchers` keep track of all possible matches of `needle`
     # along `haystack`
-    possible_matches = []
+    matchers = [{
+        "needle_idx": 0,
+        # the following list (or strings) have the same length (always)
+        "positions": [],  # e.g. [1,2,3,4,..]
+        "consumed": "",
+        "boundaries": [],  # e.g. [True,False,False,True,...]
+    }]
+
+    best_positions = tuple()
+    best_similarity = -1
+
+    needle_len = len(needle)
+    haystack_len = len(haystack)
 
     for i, c in enumerate(haystack):
 
-        # add a new active match if we encounter along `haystack`
-        # a possible "start of match" for `needle`
-        if match(c, needle[0], smart_search):
-            possible_matches.append(
-                {"needle": needle, "positions": [], "boundaries_count": 0})
+        forks = []
+        for matcher in matchers:
+            idx = matcher["consumed"].find(c.lower())
+            if idx >= 0 and len(needle[idx:]) <= haystack_len - i:
+                forks.append({
+                    "needle_idx": idx,
+                    "consumed": matcher["consumed"][:idx],
+                    "positions": matcher["positions"][:idx],
+                    "boundaries": matcher["boundaries"][:idx],
+                })
 
-        for possible_match in possible_matches:
+        matchers.extend(forks)
 
-            if not possible_match["needle"]:
+        for matcher in matchers:
+
+            if matcher["needle_idx"] == needle_len:
                 continue
 
-            if match(c, possible_match["needle"][0], smart_search):
+            if smart_search and needle[matcher["needle_idx"]].isupper():
+                cond = c == needle[matcher["needle_idx"]]
+            else:
+                cond = c.lower() == needle[matcher["needle_idx"]].lower()
 
-                possible_match["positions"].append(i)
+            if cond:
 
                 if (i == 0 or (uppercase_is_word_boundary and c.isupper()) or
                     (i > 0 and haystack[i-1] in ('-', '_'))):
-                    possible_match["boundaries_count"] += 1
+                    matcher["boundaries"].append(True)
+                else:
+                    matcher["boundaries"].append(False)
 
-                possible_match["needle"] = possible_match["needle"][1:]
+                matcher["consumed"] += needle[matcher["needle_idx"]].lower()
+                matcher["positions"].append(i)
+                matcher["needle_idx"] += 1
 
-    matches = filter(lambda m: not m["needle"], possible_matches)
-    if matches:
-        return min((similarity(haystack, m["positions"], m["boundaries_count"]), tuple(m["positions"]))
-                    for m in matches)
-    else:
-        return (-1, tuple())
+                if matcher["needle_idx"] == needle_len:
 
+                    s = similarity(haystack_len, matcher["positions"],
+                            len(filter(None, matcher["boundaries"])))
 
-def match(c1, c2, smart_search):
-    """To check if the two characters `c1` and `c2` are equals.
+                    if best_similarity < 0 or s < best_similarity:
+                        best_similarity = s
+                        best_positions = tuple(matcher["positions"])
 
-    smart_search == True: consider the case only if `c2` is uppercase.
-    """
-    if smart_search and c2.isupper():
-        return c1 == c2
-    else:
-        return c1.lower() == c2.lower()
+    return best_similarity, best_positions
 
 
-def similarity(haystack, positions, boundaries_count):
+def similarity(haystack_len, positions, boundaries_count):
     """ To compute the similarity between two strings given `haystack` and the
     positions where `needle` matches in `haystack`.
 
@@ -88,20 +107,25 @@ def similarity(haystack, positions, boundaries_count):
 
     n = 0
     diffs_sum = 0
+    contiguous_sets = 0
+
     # Generate all `positions` combinations for k = 2
     positions_len = len(positions)
     for i in range(positions_len):
+
+        if i > 0 and positions[i-1] != positions[i] - 1:
+            contiguous_sets += 1
+
         for j in range(i, positions_len):
             if i != j:
                 diffs_sum += abs(positions[i]-positions[j])
                 n += 1
 
-    len_ratio = len(haystack)/positions_len
-    if boundaries_count:
-        len_ratio /= (boundaries_count + 1)
+    if boundaries_count == 0:
+        boundaries_count = 1
 
     if n > 0:
-        return diffs_sum/n + len_ratio
+        return diffs_sum/n * contiguous_sets / boundaries_count
     else:
         # This branch is executed when len(positions) == 1
-        return positions[0] + len_ratio
+        return positions[0] * contiguous_sets / boundaries_count
