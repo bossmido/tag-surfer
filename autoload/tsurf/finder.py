@@ -89,12 +89,17 @@ class Finder:
             similarity, positions = search.search(
                     input, tag["name"], settings.get("smart_case", int))
             if positions or not input:
+                if tag["excmd"].isdigit():
+                    context = tag["excmd"]
+                else:
+                    context = tag["excmd"][2:-2]
                 matches.append({
                     "match_positions": positions,
                     "similarity": similarity,
                     "name": tag["name"],
                     "file": tag["file"],
                     "excmd": tag["excmd"],
+                    "context": context,
                     "exts": tag["exts"]
                 })
             n += 1

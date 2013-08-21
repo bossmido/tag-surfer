@@ -452,6 +452,8 @@ class Renderer:
                 return fmtstr.replace("{excmd}", tag["excmd"])
             if "{file}" in fmtstr:
                 return fmtstr.replace("{file}", fmt_file(tag))
+            if "{context}" in fmtstr:
+                return fmtstr.replace("{context}", tag["context"])
             if "{line}" in fmtstr:
                 ln = get_linenr(tag)
                 if ln:
