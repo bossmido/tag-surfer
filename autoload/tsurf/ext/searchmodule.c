@@ -190,7 +190,7 @@ similarity(int haystack_len, PyObject *positions, int boundaries_count)
 
     int n = 0;
     float diffs_sum = .0;
-    int contiguous_sets = positions_len == 1 ? 1 : 0;
+    int contiguous_sets = 1;
 
     // Generate all `positions` combinations for k = 2 and
     // sum the absolute difference computed for each one.
@@ -218,8 +218,8 @@ similarity(int haystack_len, PyObject *positions, int boundaries_count)
         return diffs_sum/n * contiguous_sets / (boundaries_count ? boundaries_count*1.0 : 1.0);
     } else {
         // `positions_len == 1`
-        return (PyFloat_AsDouble(PyList_GetItem(positions, 0)) * contiguous_sets / 
-                (boundaries_count ? boundaries_count*1.0 : 1.0));
+        return (PyFloat_AsDouble(PyList_GetItem(positions, 0)) / 
+                boundaries_count ? boundaries_count*1.0 : 1.0);
     }
 }
 

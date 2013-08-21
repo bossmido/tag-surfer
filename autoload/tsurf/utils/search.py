@@ -105,12 +105,12 @@ def similarity(haystack_len, positions, boundaries_count):
     if not positions:
         return -1
 
-    positions_len = len(positions)
-
     n = 0
     diffs_sum = 0
-    contiguous_sets = 1 if positions_len == 1 else 0
+    contiguous_sets = 1
+
     # Generate all `positions` combinations for k = 2
+    positions_len = len(positions)
     for i in range(positions_len):
 
         if i > 0 and positions[i-1] != positions[i] - 1:
@@ -128,4 +128,4 @@ def similarity(haystack_len, positions, boundaries_count):
         return diffs_sum/n * contiguous_sets / boundaries_count
     else:
         # This branch is executed when len(positions) == 1
-        return positions[0] * contiguous_sets / boundaries_count
+        return positions[0] / boundaries_count
