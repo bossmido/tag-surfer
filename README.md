@@ -109,18 +109,41 @@ you may need to set the arguments accordingly.
 Other filetype-specific customizations require you to set a couple of others
 values for the `g:tsurf_types` option:
 
-    let g:tsurf_types = {
-        "<filetype>" : {
-            \ "kinds_map": "",
-        \ }
-    \}
+```vim
+let g:tsurf_types = {
+    "<filetype>" : {
+        \ "exclude_kinds": {"constant", "variable"}
+    \ }
+\}
+```
+
+With the `exclude_kinds` key you can set exclusion rules for tags generated for
+a specific filetype based on the kind of the tag. For example, the code
+above will exclude all tags with the kind `constant` or `variable` from search
+results for files with filetype `<filetype>`. 
+
+```vim
+let g:tsurf_types = {
+    "<filetype>" : {
+        \ "kinds_map": {"c":"constant", "v":"variable"}
+    \ }
+\}
+```
+
+Settings the key `kinds_map` may be required when your custom *ctags* prgram
+display only single letters for the field *kind* and you want more readable
+names. 
+
+
+**NOTE**: At the moment the above settings works as expected only when you are
+working with files of the same filetype.
 
 
 ## Commands
 
 #### :Tsurf
 
-This command opens the *Tag Surfer*.   
+This command opens *Tag Surfer*.   
 See the *Quick start* section for how to interact with the search results list.
 
 #### :TsurfSetRoot
