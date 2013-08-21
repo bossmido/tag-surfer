@@ -215,11 +215,10 @@ similarity(int haystack_len, PyObject *positions, int boundaries_count)
     }             
 
     if (n > 0) {
-        return diffs_sum/n * contiguous_sets / (boundaries_count ? boundaries_count*1.0 : 1.0);
+        return diffs_sum/n * ++contiguous_sets / ++boundaries_count;
     } else {
         // `positions_len == 1`
-        return (PyFloat_AsDouble(PyList_GetItem(positions, 0)) / 
-                boundaries_count ? boundaries_count*1.0 : 1.0);
+        return PyFloat_AsDouble(PyList_GetItem(positions, 0)) / (++boundaries_count);
     }
 }
 
