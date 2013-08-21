@@ -87,7 +87,7 @@ class Finder:
             # If `input == ""` then everything matches. Note that if `input == ""`
             # the current search scope is just the current buffer.
             similarity, positions = search.search(
-                    input, tag["name"], settings.get("smart_search", int))
+                    input, tag["name"], settings.get("smart_case", int))
             if positions or not input:
                 matches.append({
                     "match_positions": positions,

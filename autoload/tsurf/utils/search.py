@@ -10,7 +10,7 @@ for searching tags that match the user search query.
 from __future__ import division
 
 
-def search(needle, haystack, smart_search):
+def search(needle, haystack, smart_case):
     """To search for `needle` in `haystack`.
 
     Returns a tuple of two elements: a number and another tuple.
@@ -66,7 +66,7 @@ def search(needle, haystack, smart_search):
             if matcher["needle_idx"] == needle_len:
                 continue
 
-            if smart_search and needle[matcher["needle_idx"]].isupper():
+            if smart_case and needle[matcher["needle_idx"]].isupper():
                 cond = c == needle[matcher["needle_idx"]]
             else:
                 cond = c.lower() == needle[matcher["needle_idx"]].lower()

@@ -24,10 +24,10 @@ py_search(PyObject *self, PyObject *args)
     const int needle_len;
     const char *haystack;
     const int haystack_len;
-    const int smart_search;
+    const int smart_case;
 
     if (!PyArg_ParseTuple(args, "s#s#i", 
-            &needle, &needle_len, &haystack, &haystack_len, &smart_search))
+            &needle, &needle_len, &haystack, &haystack_len, &smart_case))
         return NULL;
 
     if (needle_len == 0) {
@@ -129,7 +129,7 @@ py_search(PyObject *self, PyObject *args)
                 continue;
 
             int cond;
-            if (smart_search && isupper(needle[needle_idx]))
+            if (smart_case && isupper(needle[needle_idx]))
                 cond = haystack[i] == needle[needle_idx];
             else
                 cond = tolower(haystack[i]) == tolower(needle[needle_idx]);           
