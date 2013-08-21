@@ -151,10 +151,12 @@ With this option you can set the path of the *ctags* binary on your system if
 
 Default: `""`
 
-#### g:om\_smart\_search
+#### g:tsurf\_smart\_case
 
 With this option you can customize the behavior of uppercase letters in your
-search query. If this option is set to `1` (which is by default), ...
+search query. If this option is set to `1` (which is by default),
+case-sensitive matching is done only for uppercase letters of your search
+query. (This works just as the vim option `smartcase`) 
 
 Default:  `1`
 
@@ -166,24 +168,25 @@ Default: `1`
 
 #### g:tsurf\_line\_format
 
-With this option you can set the format for the results displayed in the search
-results window.  Note that the tag name is always displayed so only information
-about the tag such as the tag file, tag line or kind can be formatted. This
-option consists of a list of strings that may contain an attribute name
-surrounded by curly braces and some other characters. To format each line in
-the search results window this all strings in this list are joined together
-(preserving the order and each attribute surrounded by curly braces is replaced
-by the respective attribute value. If no value is found for the attribute the
-whole item is skipped. Below a list of all available attributes but note that
-not all tags will always have all the attributes available:
+With this option you can set the format for the results fo your searches.
+This option consists of a list of strings, each one containing a field name
+surrounded by curly braces of the form `{<name>}` and that will be 
+replaced with the respective *ctags* field `<name>` (have a look at the default 
+value below). Each string item of the list can contain only field and the
+reason is that if an attribut in unavailable for a specific tag the whole item
+won't show up when formattin search results.
 
-The following list is made up of attributes that are always available:
+The set of available fields varies depending on the language you are using so
+you have to consult the official *ctags* documentation or have a look at the
+raw *ctags* output for a specific language. However, the list below shows all 
+attributes that are always available:
 
-* `name`: display the tag name
-* `file`: display the file where the tag is located
-* `excmd`: display the line where the tag is located (context).
+* `name`: the tag name.
+* `file`: the file where the tag is located.
 * `kind`: the kind of the tag (execute in your terminal `ctags --list-kinds` to
-list all kinds for every supported language)
+list all kinds for every supported language).
+* `context`: the line where the tag is located. (Note that if you are using a 
+custom *ctags* executable this field may be a number).
 
 Default: `['{file}', '| {kind}']` 
 
@@ -343,9 +346,6 @@ when the current background is *dark* (`&backgroud == "dark"`).
 See the `g:tsurf_matches_color` option for examples.
 
 Default: `< the value of g:tsurf_matches_color >`
-
-
-## Tag Surfer and tag files
 
 
 ## Common issues
