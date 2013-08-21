@@ -37,7 +37,11 @@ class Finder:
         # `self.cache` holds all parsed tags generated from each run
         # of the ctags-compatible program. This is needed to improve
         # the efficiency of some operations in the user interface.
-        self.cache = []
+        self.tags_cache = []
+        self.rebuild_tags = True
+        # `self.last_search_results` holds the last search made
+        self.last_search_results = []
+        self.refind_tags = True
 
         # `self.old_tagfile` is needed to keep track of the temporary files
         # created to store the output of ctags-compatible programs so
@@ -61,16 +65,19 @@ class Finder:
         except OSError:
             pass
 
-    def find_tags(self, input, max_results=-1, rebuild_cache=True, curr_buf=None):
+    def find_tags(self, input, max_results=-1, curr_buf=None):
         """To find all matching tags."""
+        if not self.refind_tags and self.last_search_results:
+            return self.last_search_results
+
         # Determine for which files tags need to be generated. `input` is
         # also retruned with any modifier removed.
         start_time_tags_gen = datetime.now()
         input, files = self._get_search_scope(input, curr_buf.name)
-        if rebuild_cache or not self.cache:
+        if self.rebuild_tags or not self.tags_cache:
             tags = self._generate_tags(files=files, curr_ft=curr_buf.ft)
         else:
-            tags = self.cache
+            tags = self.tags_cache
         delta_tags_gen = datetime.now() - start_time_tags_gen
 
         start_time_tags_search = datetime.now()
@@ -125,7 +132,8 @@ class Finder:
         if max_results < 0 or max_results > l:
             max_results = l
 
-        return sorted(matches, key=keyf, reverse=True)[l-max_results:]
+        self.last_search_results = sorted(matches, key=keyf, reverse=True)[l-max_results:]
+        return self.last_search_results
 
     def _get_search_scope(self, input, curr_buf_name):
         """To return all files for which tags need to be generated."""
@@ -175,14 +183,14 @@ class Finder:
         # because the temporary file is then appendend to the `tags` option
         # (set tags+=tempfile) so that the user can still use vim tag-related
         # commands for navigating tags, most notably the `CTRL+t` mapping.
-        self.cache = []
+        self.tags_cache = []
         tagfile = self._generate_temporary_tagfile()
         with tagfile:
             for line in out.split("\n"):
                 tagfile.write(line + "\n")
                 tag = self._parse_tag_line(line, kinds)
                 if tag and tag["exts"].get("kind") not in exclude_kinds:
-                    self.cache.append(tag)
+                    self.tags_cache.append(tag)
                     yield tag
 
     def _get_type_specific_settings(self, ft):

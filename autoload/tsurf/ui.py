@@ -82,15 +82,17 @@ class UserInterface:
                 # Go to the tag on the current line
                 prefix = key.CHAR if key.CHAR in ('s', 'p') else ''
                 if self._open_selected_tag(prefix):
-                    self.rebuild_tags_cache = True
+                    self.plug.finder.rebuild_tags = True
+                    self.plug.finder.refind_tags = True
                     break
 
             elif key.BS:
                 # If the search scope changes, rebuild the cache
                 pmod = settings.get("project_search_modifier")
                 bmod = settings.get("buffer_search_modifier")
+                self.plug.finder.refind_tags = True
                 if self.input_so_far and self.input_so_far[-1] in (pmod, bmod):
-                    self.rebuild_tags_cache = True
+                    self.plug.finder.rebuild_tags = True
 
                 # Delete a character
                 self.input_so_far = u"{}".format(self.input_so_far)[:-1]
@@ -99,7 +101,8 @@ class UserInterface:
             elif key.ESC or key.INTERRUPT:
                 # Close the finder window
                 self.close()
-                self.rebuild_tags_cache = True
+                self.plug.finder.rebuild_tags = True
+                self.plug.finder.refind_tags = True
                 break
 
             elif key.UP or key.TAB or key.CTRL and key.CHAR == 'k':
@@ -122,6 +125,7 @@ class UserInterface:
                 # Clear the current search
                 self.input_so_far = ''
                 self.curr_line_idx = -1
+                self.plug.finder.refind_tags = True
 
             elif key.CHAR:
                 # A character has been pressed.
@@ -130,8 +134,9 @@ class UserInterface:
                 # If the search scope changes, rebuild the cache
                 pmod = settings.get("project_search_modifier")
                 bmod = settings.get("buffer_search_modifier")
+                self.plug.finder.refind_tags = True
                 if key.CHAR in (pmod, bmod) or len(self.input_so_far) == 1:
-                    self.rebuild_tags_cache = True
+                    self.plug.finder.rebuild_tags = True
 
             else:
                 v.redraw()
@@ -155,7 +160,7 @@ class UserInterface:
         self.curr_line_idx = -1  # line index in the finder window
         self.mapper = {}
         self.orig_settings = {}
-        self.rebuild_tags_cache = True
+        self.plug.finder.rebuild_tags = True
 
     def _setup_buffer(self):
         """To set sane options for the search results buffer."""
@@ -208,9 +213,9 @@ class UserInterface:
         error = None
         try:
             max_results = settings.get('max_results', int)
-            tags = self.plug.finder.find_tags(self.input_so_far, max_results,
-                    self.rebuild_tags_cache, self.curr_buf)
-            self.rebuild_tags_cache = False
+            tags = self.plug.finder.find_tags(self.input_so_far, max_results, self.curr_buf)
+            self.plug.finder.rebuild_tags = False
+            self.plug.finder.refind_tags = False
         except ex.TagSurferException as e:
             error = e
 
