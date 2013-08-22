@@ -161,6 +161,7 @@ class UserInterface:
         self.mapper = {}
         self.orig_settings = {}
         self.plug.finder.rebuild_tags = True
+        self.plug.finder.refind_tags = True
 
     def _setup_buffer(self):
         """To set sane options for the search results buffer."""
