@@ -34,7 +34,7 @@ tag search for open buffers or even whole projects.
 
 
 ==============================================================================
-2. Quick Start                                        *tag-surfer-quick-start*
+2. Usage                                                    *tag-surfer-usage*
 
 Using Tag Surfer is straightforward. To search for tags in all loaded buffers
 execute the |:Tsurf| command. If all you see is a disheartening error message
@@ -51,7 +51,7 @@ keys.
     * `CTRL+U`: clear the current search.
 
 Rememberer that when you jump to a tag you can easily jump back to the previous
-position pressing `CTRL+T`, just as you would normally do in Vim! 
+position pressing |CTRL+T|, just as you would normally do in Vim! 
 
 
 ------------------------------------------------------------------------------
