@@ -43,49 +43,54 @@ py_search(PyObject *self, PyObject *args)
             uppercase_is_word_boundary = 1;
     }
 
+    // Initialize the return values
     PyObject *best_positions = Py_BuildValue("()");
     float best_similarity = -1;    
 
-    // `matchers` keeps track of all matches of `needle` in `haystack`
-    PyObject *matchers = PyList_New(1);  // new ref
-
-    // add the first matcher
-    PyObject *matcher = PyDict_New();  // new ref
-    PyDict_SetItemString(matcher, "needle_idx", Py_BuildValue("i", 0));
-    PyDict_SetItemString(matcher, "consumed", PyList_New(0));  // list of characters
-    PyDict_SetItemString(matcher, "boundaries", PyList_New(0));  // list of numbers
-    PyDict_SetItemString(matcher, "positions", PyList_New(0));  // list of numbers
-    // Note: PyList_SetItem don't increment the reference count
-    PyList_SetItem(matchers, 0, matcher);  // PyList_SetItem do not increment the ref counter  
-
+    // Utilities variables
     PyObject *needle_pyobj = Py_BuildValue("s", needle);  // new ref    
     Py_ssize_t needle_pyobj_len = PySequence_Length(needle_pyobj);
+
+    // Declarations
+    PyObject *matcher, *fork;
+    PyObject *consumed, *positions, *boundaries;
+    int needle_idx;
+
+    // `matchers` keeps track of all possible matches of `needle` in `haystack`
+    PyObject *matchers = PyList_New(1);  // new ref
+
+    // Add the first matcher
+    matcher = PyDict_New();  // new ref
+    PyDict_SetItemString(matcher, "needle_idx", Py_BuildValue("i", 0));
+    PyDict_SetItemString(matcher, "consumed", PyList_New(0));
+    PyDict_SetItemString(matcher, "boundaries", PyList_New(0));
+    PyDict_SetItemString(matcher, "positions", PyList_New(0));
+    // Note: PyList_SetItem don't increment the reference count
+    PyList_SetItem(matchers, 0, matcher);
 
     for (int i = 0; i < haystack_len; i++) {
 
         // create forks of current matches if needed
 
-        PyObject *matcher;
-            
         Py_ssize_t matchers_len = PyList_Size(matchers);
         for (int j = 0; j < matchers_len; j++) {
 
             // get matchers[j] and its values
             matcher = PyList_GetItem(matchers, j);
             /*assert(PyDict_Check(matcher));*/
-            PyObject *consumed = PyDict_GetItemString(matcher, "consumed");
+            consumed = PyDict_GetItemString(matcher, "consumed");
             /*assert(PyList_Check(consumed));*/
-            PyObject *positions = PyDict_GetItemString(matcher, "positions");
+            positions = PyDict_GetItemString(matcher, "positions");
             /*assert(PyList_Check(positions));*/
-            PyObject *boundaries = PyDict_GetItemString(matcher, "boundaries");
+            boundaries = PyDict_GetItemString(matcher, "boundaries");
             /*assert(PyList_Check(boundaries));*/
 
-            // check if the current character in `haystack` has been matched 
-            // before by the matchers[j]. If so, we crate a fork of matcher[j].
+            // Check if the current character in `haystack` has been matched 
+            // before by matchers[j]. If so, we crate a fork of matcher[j].
+            int c;
             int idx = -1;
-            // check correctness with smart case
             for (int k = 0; k < PyList_Size(consumed); k++) {
-                int c = PyInt_AsLong(PyList_GetItem(consumed, k));
+                c = PyInt_AsLong(PyList_GetItem(consumed, k));
                 if (tolower(haystack[i]) == c) { 
                     idx = k;
                     break;
@@ -93,9 +98,14 @@ py_search(PyObject *self, PyObject *args)
             }
             if (idx >= 0) {           
                 PyObject *slice = PySequence_GetSlice(needle_pyobj, idx, needle_pyobj_len);  // new ref
+                // The slice contains all characters that remains to be matched
+                // by this possible fork in `haystack`. If there is room for
+                // this remaining characters to be matched in `haystack` then
+                // we create a fork, otherwise there is no need to since the
+                // match won't certainly succeed.
                 if (PySequence_Length(slice) <= haystack_len - i) {
                     // create a new fork
-                    PyObject *fork = PyDict_New();  // new ref
+                    fork = PyDict_New();  // new ref
                     PyDict_SetItemString(fork, "needle_idx", Py_BuildValue("i", idx));
                     PyDict_SetItemString(fork, "consumed", PySequence_GetSlice(consumed, 0, idx));
                     PyDict_SetItemString(fork, "boundaries", PySequence_GetSlice(boundaries, 0, idx));
@@ -110,25 +120,24 @@ py_search(PyObject *self, PyObject *args)
 
         // update each matcher
         
+        int cond;
         PyObject *pos, *c;
 
         for (int j = 0; j < PyList_Size(matchers); j++) {
             
-            PyObject *matcher = PyList_GetItem(matchers, j);  // borrowed ref
+            matcher = PyList_GetItem(matchers, j);  // borrowed ref
             /*assert(PyDict_Check(matcher));*/
-
-            int needle_idx = PyInt_AsLong(PyDict_GetItemString(matcher, "needle_idx"));
-            PyObject *consumed = PyDict_GetItemString(matcher, "consumed");
+            needle_idx = PyInt_AsLong(PyDict_GetItemString(matcher, "needle_idx"));
+            consumed = PyDict_GetItemString(matcher, "consumed");
             /*assert(PyList_Check(consumed));*/
-            PyObject *positions = PyDict_GetItemString(matcher, "positions");
+            positions = PyDict_GetItemString(matcher, "positions");
             /*assert(PyList_Check(positions));*/
-            PyObject *boundaries = PyDict_GetItemString(matcher, "boundaries");
+            boundaries = PyDict_GetItemString(matcher, "boundaries");
             /*assert(PyList_Check(boundaries));*/
 
             if (needle_idx == needle_len)
                 continue;
 
-            int cond;
             if (smart_case && isupper(needle[needle_idx]))
                 cond = haystack[i] == needle[needle_idx];
             else
@@ -218,7 +227,7 @@ similarity(int haystack_len, PyObject *positions, int boundaries_count)
         return diffs_sum/n * ++contiguous_sets / ++boundaries_count;
     } else {
         // `positions_len == 1`
-        return PyFloat_AsDouble(PyList_GetItem(positions, 0)) / (++boundaries_count);
+        return PyFloat_AsDouble(PyList_GetItem(positions, 0)) / ++boundaries_count;
     }
 }
 
