@@ -72,7 +72,7 @@ class UserInterface:
             color = settings.get("prompt_color")
             vim.command("echohl {} | echon \"{}\" | echohl None".format(color, prompt))
             query = self.input_so_far.encode('utf-8')
-            qery = query.replace("\\", "\\\\").replace('"', '\\"')
+            query = query.replace("\\", "\\\\").replace('"', '\\"')
             vim.command("echon \"{}\"".format(query))
 
             # Wait for the next key
