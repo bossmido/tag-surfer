@@ -79,8 +79,8 @@ prepend to your search query. Below is list of all available modifiers:
 * `%`: this modifier narrows the search scope to the current buffer.
 * `#`: this modifier widens the search scope to all files of the current
 project. Note that a project root is assumed to be the one that contains 
-any of the file or directory names listed in the `g:om_root_markers` option 
-(by default these are `.git`, `.svn`, `.hg`, `.bzr` and `_darcs`).
+any of the file or directory names listed in the `g:tsurf_root_markers` 
+option (by default these are `.git`, `.svn`, `.hg`, `.bzr` and `_darcs`).
 
 #### Languages support
 
@@ -194,6 +194,14 @@ arguements to the *ctags* executable. See the official [Exuberant Ctags document
 
 Default: `""`
 
+#### g:tsurf\_custom\_languages
+
+With this option you can add support for languages not officially supported 
+by Exuberant Ctags. See the section "Quick Start" for 
+instructions on how to set this option.
+
+Default: `{}`
+
 #### g:tsurf\_smart\_case
 
 With this option you can customize the behavior of uppercase letters in your
@@ -202,6 +210,30 @@ case-sensitive matching is done only for uppercase letters of your search
 query. (This works just as the vim option `smartcase`) 
 
 Default:  `1`
+
+#### g:tsurf\_root\_markers
+
+This option is a list containing file or directory names used by *Tag Surfer*
+to locate the current project root. Note that these have no precedence over
+a custom root that may have been set with the `:TsurfSetRoot` command.
+
+Default:  `['.git', '.svn', '.hg', '.bzr', '_darcs']`
+
+#### g:tsurf\_buffer\_search\_modifier
+
+With this option you can set the modifier used to narrow the search scope
+to the current buffer.
+
+Default: `"%"`
+
+#### g:tsurf\_project\_search\_modifier
+
+With this option you can set the modifier used to widen the search scope
+to the current buffer.
+
+Default: `"#"`
+
+## Appearance options
 
 #### g:tsurf\_max\_results
 
@@ -261,36 +293,6 @@ perform project-wide searches, even if `g:tsurf_tag_file_custom_depth > 1`.
 Note that this behavior is default when `g:tsurf_tag_file_full_path == 1`.
 
 Default: `1`
-
-#### g:tsurf\_languages
-
-With this option you can add support for languages not supported by *ctags* and
-add some filetype-specifi filters. See the *Quick start* section for how to set
-this option.
-
-Default: `{}`
-
-#### g:tsurf\_root\_markers
-
-This option is a list containing file or directory names used by *Tag Surfer*
-to locate the current project root. Note that these have no precedence over
-a custom root that may have been set with the `:TsurfSetRoot` command.
-
-Default:  `['.git', '.svn', '.hg', '.bzr', '_darcs']`
-
-#### g:tsurf\_buffer\_search\_modifier
-
-With this option you can set the modifier used to narrow the search scope
-to the current buffer.
-
-Default: `"%"`
-
-#### g:tsurf\_project\_search\_modifier
-
-With this option you can set the modifier used to widen the search scope
-to the current buffer.
-
-Default: `"#"`
 
 #### g:tsurf\_prompt
 
