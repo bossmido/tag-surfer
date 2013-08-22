@@ -92,54 +92,59 @@ languages are supported with
 If your favorite language is not listed in the output of the previous command,
 the easiest way to add support for it in *Tag Surfer* is to search for
 a *ctags-compatible* program that can generate tags for that language. *Tag
-Surfer* provides the `g:tsurf_types` option for integrating a custom
-*ctags-compatible* program fo non-supported languages:
+Surfer* provides the `g:tsurf_custom_languages` option to easily integrate a custom
+*ctags-compatible* program for non-supported languages:
 
 ```vim
-let g:tsurf_types = {
+let g:tsurf_custom_languages = {
     \ "<filetype>" : {
-        \ "bin": "<path to the custom ctags-compatible program>",
-        \ "args": "<arguments for the custom ctags-compatible program>",
+        \ "bin": "/path/to/my/custom/ctags",
+        \ "args": "--arguments for the --custom ctags",
     \ }
 \}
 ```
 
-In order to make things work you have to be sure that the output of the custom
-*ctags-compatible* program is be **sorted** and redirected to **stdout**, so
-you may need to set the arguments accordingly.
-
-Other filetype-specific customizations require you to set a couple of others
-values for the `g:tsurf_types` option:
+With the *bin* and *args* you can set the path of custom *ctags* program and
+its arguments respectively.  In order to make things work you have to be sure
+that the output of the custom *ctags-compatible* program is will be **sorted**
+and redirected to **stdout**, so you may need to set the arguments accordingly.
 
 ```vim
-let g:tsurf_types = {
+let g:tsurf_custom_languages = {
+    \ "<filetype>" : {
+        \ "extensions": [".ext1", ".ext2"],
+    \ }
+\}
+```
+
+Setting the *extensions* key is paramount. This is a list of file extensions
+used by source files of the given `<filetype>`. 
+
+Other minor customizations require you to set a couple of others keys:
+
+```vim
+let g:tsurf_custom_languages = {
     \ "<filetype>" : {
         \ "exclude_kinds": {"constant", "variable"}
     \ }
 \}
 ```
 
-With the `exclude_kinds` key you can set exclusion rules for tags generated for
-a specific filetype based on the kind of the tag. For example, the code
-above will exclude all tags with the kind `constant` or `variable` from search
-results for files with filetype `<filetype>`. 
+With the `exclude_kinds` key you can set exclusion rules based on the kind of the tag. 
+For example, the code above will exclude all tags with the kind `constant` or `variable`
+from search results for files with the filetype `<filetype>`. 
 
 ```vim
-let g:tsurf_types = {
+let g:tsurf_custom_languages = {
     \ "<filetype>" : {
         \ "kinds_map": {"c":"constant", "v":"variable"}
     \ }
 \}
 ```
 
-Settings the key `kinds_map` may be required when your custom *ctags* prgram
-display only single letters for the field *kind* and you want more readable
+Setting the `kinds_map` key may be required when your custom *ctags* prgram
+displays only single letters for the *kind* field and you want more readable
 names. 
-
-
-**NOTE**: At the moment the above settings works as expected only when you are
-working with files of the same filetype.
-
 
 ## Commands
 
@@ -176,6 +181,19 @@ With this option you can set the path of the *ctags* binary on your system if
 
 Default: `""`
 
+#### g:tsurf\_ctags\_custom\_args
+
+With this option you can set additional arguments for `g:tsurf_ctags_bin`.
+I say *additional* because *Tag Surfer* already provides some default arguments
+to `g:tsurf_ctags_bin` (`"-f - --format=2 --excmd=pattern --sort --fields=nKzmafilmsSt"`).
+   
+You may want to use this option when you need to provide filetype specific
+arguements to the *ctags* executable. See the official [Exuberant Ctags documentation]
+(http://ctags.sourceforge.net/ctags.html) for all the arguments available to
+*Exuberant Ctags*.
+
+Default: `""`
+
 #### g:tsurf\_smart\_case
 
 With this option you can customize the behavior of uppercase letters in your
@@ -202,9 +220,9 @@ reason is that if an attribut in unavailable for a specific tag the whole item
 won't show up when formattin search results.
 
 The set of available fields varies depending on the language you are using so
-you have to consult the official *ctags* documentation or have a look at the
-raw *ctags* output for a specific language. However, the list below shows all 
-attributes that are always available:
+you have to consult the official [Exuberant Ctags documentation](http://ctags.sourceforge.net/ctags.html)
+or have a look at the raw *ctags* output for a specific language. However, the 
+list below shows all attributes that are always available:
 
 * `name`: the tag name.
 * `file`: the file where the tag is located.
