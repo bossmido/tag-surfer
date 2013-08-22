@@ -125,7 +125,7 @@ Other minor customizations require you to set a couple of others keys:
 ```vim
 let g:tsurf_custom_languages = {
     \ "<filetype>" : {
-        \ "exclude_kinds": {"constant", "variable"}
+        \ "exclude_kinds": ["constant", "variable"]
     \ }
 \}
 ```
