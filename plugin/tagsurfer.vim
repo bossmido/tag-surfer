@@ -86,7 +86,7 @@ let g:tsurf_ctags_bin =
     \ s:find_ctags_bin(get(g:, "tsurf_ctags_bin", ""))
 
 let g:tsurf_ctags_args =
-    \ get(g:, "tsurf_ctags_args", "-f - --format=2 --excmd=pattern --sort --fields=nKzmafilmsSt")
+    \ get(g:, "tsurf_ctags_args", "-f - --format=2 --excmd=pattern --sort=yes --fields=nKzmafilmsSt")
 
 let g:tsurf_ctags_custom_args =
     \ get(g:, "tsurf_ctags_custom_args", "")
