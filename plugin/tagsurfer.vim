@@ -88,6 +88,9 @@ let g:tsurf_ctags_bin =
 let g:tsurf_ctags_args =
     \ get(g:, "tsurf_ctags_args", "-f - --format=2 --excmd=pattern --sort=yes --extra= --fields=nKzmafilmsSt")
 
+let g:tsurf_ctags_custom_args =
+    \ get(g:, "tsurf_ctags_custom_args", "")
+
 " Search type and scope
 
 let g:tsurf_smart_case =
@@ -104,8 +107,8 @@ let g:tsurf_root_markers =
 
 " Custom languages support
 
-let g:tsurf_languages =
-    \ get(g:, "tsurf_languages", {})
+let g:tsurf_custom_languages =
+    \ get(g:, "tsurf_custom_languages", {})
 
 " Appearance
 
