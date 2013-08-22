@@ -3,9 +3,6 @@
  *
  * C version of `tsurf.utils.search`.
  *
- * TODO: Use a struct instead of a python dictionary for
- * storing info about a possible match.
- *
  */
 
 #include "searchmodule.h"
@@ -183,7 +180,7 @@ py_search(PyObject *self, PyObject *args)
         }
     }
     Py_DECREF(needle_pyobj);
-    Py_XDECREF(matchers);
+    Py_DECREF(matchers);
     return Py_BuildValue("(f,N)", best_similarity, best_positions);
 }
 
