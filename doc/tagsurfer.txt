@@ -2,7 +2,7 @@
 *tag-surfer*
 
 
-                                Tag Surfer
+                        Tag Surfer - Fuzzy tag search
 
                                      ~
 

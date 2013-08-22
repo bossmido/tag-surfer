@@ -1,6 +1,6 @@
 # Tag Surfer
 
-Tag search for the Vim editor.
+Fuzzy tag search for Vim.
 
 ## Installation
 
