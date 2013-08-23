@@ -24,7 +24,7 @@ class UserInterface:
 
     def __init__(self, plug):
         self.plug = plug
-        self.name = '__om__'
+        self.name = '__tag_surfer__'
 
         # This ease passing around current buffer information. We need this
         # because once the finder is open we can no longer access local buffer
