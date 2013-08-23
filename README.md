@@ -1,6 +1,7 @@
 # Tag Surfer
 
 Fuzzy tag search for Vim.
+![Live Example](_assets/live.gif "Tag Surfer on action.")
 
 ## Installation
 
