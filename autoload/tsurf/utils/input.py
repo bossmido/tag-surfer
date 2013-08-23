@@ -23,8 +23,8 @@ class Input:
         self.CHAR = ""
         self.F1 = self.F2 = self.F3 = self.F4 = self.F5 = self.F6 = None
         self.F7 = self.F8 = self.F9 = self.F10 = self.F11 = self.F12 = None
-        vim.command("let g:_ozzy_char = ''")
-        vim.command("let g:_ozzy_interrupt = 0")
+        vim.command("let g:_tsurf_char = ''")
+        vim.command("let g:_tsurf_interrupt = 0")
 
     def get(self):
         """To read a key pressed by the user."""
@@ -32,19 +32,19 @@ class Input:
 
         vim.command("""
             try |
-             let g:_ozzy_char = strtrans(getchar()) |
+             let g:_tsurf_char = strtrans(getchar()) |
             catch |
-             let g:_ozzy_interrupt = 1 |
+             let g:_tsurf_interrupt = 1 |
             endtry
         """)
 
-        if vim.eval('g:_ozzy_interrupt') == '1':  # Ctrl + c
+        if vim.eval('g:_tsurf_interrupt') == '1':  # Ctrl + c
             self.CTRL = True
             self.CHAR = unicode("c", "utf-8")
             self.INTERRUPT = True
             return
 
-        raw_char = vim.eval('g:_ozzy_char')
+        raw_char = vim.eval('g:_tsurf_char')
 
         # only with mac os
         # 'cmd' key has been pressed

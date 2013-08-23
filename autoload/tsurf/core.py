@@ -16,6 +16,7 @@ import vim
 from tsurf import ui
 from tsurf import finder
 from tsurf import services
+from tsurf.utils import v
 
 
 class TagSurfer:
@@ -41,8 +42,7 @@ class TagSurfer:
             root = root.replace("~", home)
         elif root.startswith("$HOME"):
             root = root.replace("$HOME", home)
-        self.services.curr_project.set_root(
-                root if root else vim.eval("getcwd()"))
+        self.services.curr_project.set_root(root if root else v.cwd())
 
     def UnsetProjectRoot(self):
         """To unset the current project root."""

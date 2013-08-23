@@ -52,8 +52,8 @@ def bufwinnr(expr):
 
 
 def winnr(expr=None):
-    """To return the current window number or the number of the window 
-    numbered 'expr'."""
+    """To return the current window number or the number of the window
+    `expr` (where `expr` can be '#' or '%')."""
     if expr is None:
         return int(vim.eval("winnr()"))
     else:
