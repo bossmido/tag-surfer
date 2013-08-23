@@ -23,7 +23,7 @@ def echohl(msg, hlgroup):
 
 
 def cwd():
-    """To return the current buffer directory if exists."""
+    """To return the current working directory."""
     return vim.eval('getcwd()')
 
 
@@ -52,7 +52,8 @@ def bufwinnr(expr):
 
 
 def winnr(expr=None):
-    """To return the current window number."""
+    """To return the current window number or the number of the window 
+    numbered 'expr'."""
     if expr is None:
         return int(vim.eval("winnr()"))
     else:
