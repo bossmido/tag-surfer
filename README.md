@@ -118,7 +118,7 @@ let g:tsurf_custom_languages = {
 ```
 
 Setting the *extensions* key is paramount. This is a list of file extensions
-used by source files of the given `<filetype>`. 
+used by `<filetype>` source files. 
 
 Other minor customizations require you to set a couple of others keys:
 
