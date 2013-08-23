@@ -14,10 +14,10 @@ from operator import itemgetter
 from collections import namedtuple
 from itertools import imap, groupby
 
-from tsurf import exceptions as ex
-from tsurf.utils import settings
-from tsurf.utils import input
 from tsurf.utils import v
+from tsurf.utils import input
+from tsurf.utils import settings
+from tsurf import exceptions as ex
 
 
 class UserInterface:
@@ -26,29 +26,28 @@ class UserInterface:
         self.plug = plug
         self.name = '__tag_surfer__'
 
-        # This ease passing around current buffer information. We need this
-        # because once the finder is open we can no longer access local buffer
-        # information since the focus is constantly on the finder window.
+        # `self.CurrBuffer` ease passing around current buffer information.
+        # We need this because once the finder is open we can no longer access
+        # local buffer information since the focus is constantly on the finder
+        # window.
         self.CurrBuffer = namedtuple(
             "CurrBuffer", "content name cursor winnr ft")
 
         # The renderer is responsible for rendering all search results
         # in the finder window
         self.renderer = Renderer(plug)
-        self.renderer.setup_colors()
 
+        self.renderer.setup_colors()
         self._reset()
 
     def open(self):
         """To open the Tag Surfer user interface."""
-        # The Fugitive plugin seems to interfere with Tag Surfer since Fugitive
-        # add some filenames to the option `tags`. Tag Surfer does this too,
+        # The Fugitive plugin seems to interfere with Tag Surfer since it adds
+        # some filenames to the vim option `tags`. Tag Surfer does this too,
         # but if Fugitive is installed and the user is editing a file in a git
         # repository, it seems that Tag Surfer cannot append anything to the
-        # `tag` option. However, I haven't still figured out why running this
-        # seemengly useless command fix the issue. Note that this command works
-        # only if called at this location. This surely isn't magic but this is
-        # very strange.
+        # `tag` option. I haven't still figured out why this happens but this
+        # seems to fix the issue.
         vim.command("exe 'set tags=' . &tags")
 
         # Save some info about the current buffer
@@ -60,32 +59,31 @@ class UserInterface:
             vim.eval("&ft"))
 
         # Populate the search results window with tags from the current buffer
-        # even though the user haven't searched anything yet.
+        # even though the user haven't searched anything yet (this will show
+        # tags from the curretn buffer).
         self._update()
 
         # Start the input loop
         key = input.Input()
         while True:
 
-            # Display the prompt and the current search string
+            # Display the prompt and the current query string
             prompt = settings.get("prompt")
             color = settings.get("prompt_color")
             vim.command("echohl {} | echon \"{}\" | echohl None".format(color, prompt))
-            query = self.input_so_far.encode('utf-8')
-            query = query.replace("\\", "\\\\").replace('"', '\\"')
-            vim.command("echon \"{}\"".format(query))
+            query = self.input_so_far.replace("\\", "\\\\").replace('"', '\\"')
+            vim.command("echon \"{}\"".format(query.encode('utf-8')))
 
             # Wait for the next key
             key.get()
 
+            # Go to the tag on the current line
             if (key.RETURN or key.CTRL and key.CHAR in ('g', 'o', 'p', 's')):
-                # Go to the tag on the current line
                 prefix = key.CHAR if key.CHAR in ('s', 'p') else ''
                 if self._open_selected_tag(prefix):
-                    self.plug.finder.rebuild_tags = True
-                    self.plug.finder.refind_tags = True
                     break
 
+            # Delete a character backward
             elif key.BS:
                 # If the search scope changes, rebuild the cache
                 pmod = settings.get("project_search_modifier")
@@ -93,42 +91,38 @@ class UserInterface:
                 self.plug.finder.refind_tags = True
                 if self.input_so_far and self.input_so_far[-1] in (pmod, bmod):
                     self.plug.finder.rebuild_tags = True
-
-                # Delete a character
                 self.input_so_far = u"{}".format(self.input_so_far)[:-1]
                 self.curr_line_idx = -1
 
+            # Close Tag Surfer
             elif key.ESC or key.INTERRUPT:
-                # Close the finder window
                 self.close()
-                self.plug.finder.rebuild_tags = True
-                self.plug.finder.refind_tags = True
                 break
 
+            # Move up the cursor
             elif key.UP or key.TAB or key.CTRL and key.CHAR == 'k':
-                # Move up the cursor
                 last_index = len(vim.current.buffer) - 1
                 if self.curr_line_idx == 0:
                     self.curr_line_idx = last_index
                 else:
                     self.curr_line_idx -= 1
 
+            # Move down the cursor
             elif key.DOWN or key.CTRL and key.CHAR == 'j':
-                # Move down the cursor
                 last_index = len(vim.current.buffer) - 1
                 if self.curr_line_idx == last_index:
                     self.curr_line_idx = 0
                 else:
                     self.curr_line_idx += 1
 
+            # Clear the current search
             elif key.CTRL and key.CHAR == 'u':
-                # Clear the current search
                 self.input_so_far = ''
                 self.curr_line_idx = -1
                 self.plug.finder.refind_tags = True
 
+            # A character has been pressed.
             elif key.CHAR:
-                # A character has been pressed.
                 self.input_so_far += key.CHAR
                 self.curr_line_idx = -1
                 # If the search scope changes, rebuild the cache
@@ -151,6 +145,7 @@ class UserInterface:
         if self.curr_buf.winnr:
             v.focus_win(self.curr_buf.winnr)
         self._reset()
+        v.redraw()  # Clean the command line
 
     def _reset(self):
         """To reset the Tag Surfer user interface state."""
@@ -220,8 +215,8 @@ class UserInterface:
         except ex.TagSurferException as e:
             error = e
 
-        self.mapper, self.curr_line_idx = self.renderer.render(self.finder_win,
-                self.curr_line_idx, self.input_so_far, tags, error)
+        self.mapper, self.curr_line_idx = self.renderer.render(
+                self.finder_win, self.curr_line_idx, self.input_so_far, tags, error)
 
         v.redraw()
 
@@ -310,16 +305,14 @@ class UserInterface:
             # have to pick the best candidate
             count = self._get_best_tag_candidate(tag)
             if count:
-                vim.command("silent {}{}tag {}".format(
-                    count, prefix, tag["name"]))
+                vim.command("silent {}{}tag {}".format(count, prefix, tag["name"]))
             else:
                 # An error occurred, probably no tag file has been found
-                v.echohl(
-                    "No tag file found. be sure that the `tags` option "
-                    "is not changed while Tag Surfer is working",
-                    "WarningMsg")
+                v.echohl("No tag file found. be sure that the `tags` option "
+                         "is not changed while Tag Surfer is working",
+                         "WarningMsg")
 
-            vim.command("normal! zz")  # center the screen
+            vim.command("normal! zz")  # Center the screen
             return True
 
 
@@ -413,8 +406,7 @@ class Renderer:
             # are printed with the absolute path.
             if settings.get("tag_file_relative_to_project_root", bool):
                 if root:
-                    f = file.replace(root, "").replace(
-                            os.path.expanduser("~"), "~")
+                    f = file.replace(root, "").replace(os.path.expanduser("~"), "~")
                     return f[1:] if f.startswith(os.path.sep) else f
 
             # If the `g:tsurf_tag_file_custom_depth` is set,
