@@ -17,10 +17,10 @@ from datetime import datetime
 from operator import itemgetter
 from collections import defaultdict
 
-from tsurf import exceptions as ex
-from tsurf.utils import settings
-from tsurf.utils import misc
 from tsurf.utils import v
+from tsurf.utils import misc
+from tsurf.utils import settings
+from tsurf import exceptions as ex
 
 try:
     from tsurf.ext import search
@@ -35,18 +35,26 @@ class Finder:
     def __init__(self, plug):
         self.plug = plug
 
-        # `self.cache` holds all parsed tags generated from each run
-        # of the ctags-compatible program. This is needed to improve
-        # the efficiency of some operations in the user interface.
-        self.tags_cache = []
+        # `self.rebuild_tags` is True when tags need to be re-generated.
+        # at the moment tags are regenerated everytime the user closes
+        # Tag Surfer or change the search scope.
         self.rebuild_tags = True
-        # `self.last_search_results` holds the last search made
-        self.last_search_results = []
+        # `self.tags_cache` holds all parsed tags generated from the execution
+        # of the ctags program. This attribute works in conjunction with the
+        # attribute `self.rebuild_tags`
+        self.tags_cache = []
+
+        # `self.find_tags` is True when a new search needs to be done.
+        # The only time this is set to `False` is when the user moves around
+        # in the search results window.
         self.refind_tags = True
+        # `self.last_search_results` holds the last search. This attribute
+        # works in conjunction with the attribute `self.refind_tags`
+        self.last_search_results = []
 
         # `self.old_tagfiles` is needed to keep track of the temporary files
         # created to store the output of ctags-compatible programs so
-        # that we can delete it when a new one is generated.
+        # that we can delete it when a new ones are generated.
         self.old_tagfiles = []
 
         # Some stuff required by Windows
@@ -63,30 +71,43 @@ class Finder:
         """To perform cleanup actions."""
         self._remove_tagfiles()
 
-    def find_tags(self, input, max_results=-1, curr_buf=None):
-        """To find all matching tags."""
+    def find_tags(self, query, max_results=-1, curr_buf=None):
+        """To find all matching tags for the given `query`."""
+        # Do not perform a new search if the user is just moving around
+        # in the search results window.
         if not self.refind_tags and self.last_search_results:
             return self.last_search_results
 
-        # Determine for which files tags need to be generated. `input` is
-        # also retruned with any modifier removed.
+        # debug
         start_time_tags_gen = datetime.now()
-        input, files = self._get_search_scope(input, curr_buf.name)
+
+        # Determine for which files tags need to be generated. `query` is
+        # also retruned with any modifier removed. Th `query` is also cleaned
+        # from the mofifier if present.
+        query, files = self._get_search_scope(query, curr_buf.name)
+
+        # Generate tags for all given `files` or return cached results if
+        # possible.
         if self.rebuild_tags or not self.tags_cache:
             tags = self._generate_tags(files=files, curr_ft=curr_buf.ft)
         else:
             tags = self.tags_cache
+
+        # debug
         delta_tags_gen = datetime.now() - start_time_tags_gen
 
+        # debug
         start_time_tags_search = datetime.now()
         n = 0
+
+        # Match each tag against the give query
         matches = []
         for tag in tags:
-            # If `input == ""` then everything matches. Note that if `input == ""`
+            # If `query == ""` then everything matches. Note that if `query == ""`
             # the current search scope is just the current buffer.
             similarity, positions = search.search(
-                    input, tag["name"], settings.get("smart_case", int))
-            if positions or not input:
+                    query, tag["name"], settings.get("smart_case", int))
+            if positions or not query:
                 if tag["excmd"].isdigit():
                     context = tag["excmd"]
                 else:
@@ -100,7 +121,10 @@ class Finder:
                     "context": context,
                     "exts": tag["exts"]
                 })
+
             n += 1
+
+        # debug
         delta_tags_search = datetime.now() - start_time_tags_search
 
         # In debug mode, display some statistics in the statusline
@@ -113,15 +137,16 @@ class Finder:
                  TSURF_SEARCH_EXT_LOADED))
             vim.command("setl stl={}".format(s.replace(" ", "\ ").replace("|", "\|")))
 
-        if input:
-            # Sort by similarity
+        # Sort the search results according to the similarity value if
+        # the `query` string is non-empty, otherwise sort the search results
+        # by name or line number (if available). Remember that if the query
+        # is epty the only tags for the curretn buffer are generate.
+        if query:
             keyf = itemgetter("similarity")
         else:
             if len(matches) and (matches[0]["exts"].get("line") or matches[0]["excmd"].isdigit()):
                 # If a line number is available for locating the tags, then sort
-                # them according to their distance from the cursor. We can do
-                # this because `input == ""` so only tags for the current buffer
-                # are generated.
+                # them according to their distance from the cursor.
                 curr_line = curr_buf.cursor[0]
                 if matches[0]["exts"].get("line"):
                     keyf = lambda m: abs(curr_line - int(m["exts"]["line"]))
@@ -135,54 +160,70 @@ class Finder:
         if max_results < 0 or max_results > l:
             max_results = l
 
+        # Retrun only `max-results` search results.
         self.last_search_results = sorted(matches, key=keyf, reverse=True)[l-max_results:]
         return self.last_search_results
 
     def _remove_tagfiles(self):
+        """To delete all temporary tagfiles created previously."""
         for tagfile in self.old_tagfiles:
+            # Don't forget to clean up the `tag` vim option
             vim.command("set tags-={}".format(tagfile))
             try:
                 os.remove(tagfile)
             except OSError:
                 pass
 
-    def _get_search_scope(self, input, curr_buf_name):
+    def _get_search_scope(self, query, curr_buf_name):
         """To return all files for which tags need to be generated."""
         pmod = settings.get("project_search_modifier")
         bmod = settings.get("buffer_search_modifier")
-
         files = []
-        if curr_buf_name and (not input or input.strip().startswith(bmod)):
+        if curr_buf_name and (not query or query.strip().startswith(bmod)):
+            # Retrun only the current buffer
             files = [curr_buf_name]
-        elif input.strip().startswith(pmod):
+        elif query.strip().startswith(pmod):
+            # Retrun all files of the current project. If the project root
+            # cannot be located, the retruned list is empty.
             files = self.plug.services.curr_project.get_files()
         if not files:
+            # Retrun all loaded buffers
             files = v.buffers()
 
-        return input.strip(" " + bmod + pmod), files
+        return query.strip(" " + bmod + pmod), files
 
     def _generate_tags(self, files, curr_ft=None):
         """To generate tags for files in `files`.
 
-        If a file isn't supported by the official ctags program, then
-        use the custom ctags executable provided via the
-        `tsurf_cuatom_languages` option, if any.
+        If a filetype isn't supported by Exuberant Ctags, then use the custom
+        ctags executable provided via the `tsurf_custom_languages` option.
         """
-        # clean old tagfiles
+        # Clean old tagfiles
         self._remove_tagfiles()
 
         custom_langs = settings.get("custom_languages")
 
+        # Create a map where each file extension points to
+        # a specific filetype.
         extensions_map = {}
         for ft, options in custom_langs.items():
             for ext in options.get("extensions", []):
                 extensions_map[ext] = ft
 
+        # Group files according to their filetype. The filetype "*"
+        # groups all files that will be parsed by Exuberant Ctags.
+        # Note that filetype groups different from "*" are generated
+        # only for filetypes found in `tsurf_custom_languages`
         groups = defaultdict(list)
         for f in files:
             ext = os.path.splitext(f)[1]
             groups[extensions_map.get(ext, "*")].append(f)
 
+        # For each filetype group, generate tags according to the ctags
+        # program specified for that filetype. Doind so ensures that
+        # if the user is working with different filetypes at the same time,
+        # tags are generated transparently for each different (possibly
+        # not supported by Exuberant Ctags) filetype.
         for ft, file_group in groups.items():
 
             if ft == "*":
@@ -225,12 +266,12 @@ class Finder:
                 raise ex.TagSurferException("Error: The program '{}' does not exists "
                     "or cannot be found in your $PATH".format(bin))
 
-            # Parse the ctags-compatigle program output, rebuild the cache and
-            # write a copy of the output to a temporary file.
-            # Why writing a copy of the output to a temporary file? We do this
-            # because the temporary file is appendend to the `tags` option
-            # (set tags+=tempfile) so that the user can still use vim tag-related
-            # commands for navigating tags, most notably the `CTRL+t` mapping.
+            # Parse the ctags program output, rebuild the cache and write
+            # a copy of the output to a temporary file.  Why writing a copy of
+            # the output to a temporary file? We do this because the temporary
+            # file is appendend to the `tags` option (set tags+=tempfile) so
+            # that the user can still use vim tag-related commands for
+            # navigating tags, most notably the `CTRL+t` mapping.
             self.tags_cache = []
             tagfile = self._generate_temporary_tagfile()
             with tagfile:
