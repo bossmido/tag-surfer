@@ -219,6 +219,7 @@ class Finder:
             ext = os.path.splitext(f)[1]
             groups[extensions_map.get(ext, "*")].append(f)
 
+        self.tags_cache = []
         # For each filetype group, generate tags according to the ctags
         # program specified for that filetype. Doind so ensures that
         # if the user is working with different filetypes at the same time,
@@ -272,7 +273,6 @@ class Finder:
             # file is appendend to the `tags` option (set tags+=tempfile) so
             # that the user can still use vim tag-related commands for
             # navigating tags, most notably the `CTRL+t` mapping.
-            self.tags_cache = []
             tagfile = self._generate_temporary_tagfile()
             with tagfile:
                 for line in out.split("\n"):
