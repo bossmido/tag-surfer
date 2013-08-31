@@ -1,13 +1,4 @@
-" ============================================================================
-" File: autoload/tsurf.vim
-" Description: Tag surfing for vim
-" Mantainer: Giacomo Comitti (https://github.com/gcmt)
-" Url: https://github.ctsurf/gcmt/tsurf
-" License: MIT
-" Version: 1.0
-" Last Changed: 17 Aug 2013
-" ============================================================================
-
+" autoload/tsurf.vim
 
 " Init
 " ----------------------------------------------------------------------------

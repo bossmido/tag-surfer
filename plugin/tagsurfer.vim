@@ -4,7 +4,6 @@
 " Mantainer: Giacomo Comitti (https://github.com/gcmt)
 " Url: https://github.com/gcmt/tsurf
 " License: MIT
-" Version: 1.0
 " Last Changed: 17 Aug 2013
 " ============================================================================
 
