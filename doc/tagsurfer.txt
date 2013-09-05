@@ -1,8 +1,7 @@
-*tag-surfer.txt* 
-*tag-surfer*
+*tag-surfer.txt* *tag-surfer* *tagsurfer*
 
 
-                        Tag Surfer - Fuzzy tag search
+                                Tag Surfer
 
                                      ~
 
@@ -68,6 +67,11 @@ to your search query. Below is list of all available modifiers:
            |'tsurf_root_markers'| option (by default these are .git, .svn,
            .hg`, .bzr and _darcs).
 
+You may find useful setting in your `vimrc` something like this:
+>
+    nnoremap <leader>b :Tsurf<CR>%
+    nnoremap <leader>p :Tsurf<CR>#
+<
 
 ------------------------------------------------------------------------------
 2.2. Languages support                          *tag-surfer-languages-support*
