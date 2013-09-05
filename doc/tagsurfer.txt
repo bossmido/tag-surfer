@@ -19,8 +19,9 @@ CONTENTS                                                 *tag-surfer-contents*
     3. Commands .............................. |tag-surfer-commands|
     4. Basic Options ......................... |tag-surfer-basic-options|
     5. Appearance ............................ |tag-surfer-appearance|
-    6. About ................................. |tag-surfer-about|
-    7. License ............................... |tag-surfer-license|
+    6. Changelog ............................. |tag-surfer-changelog|
+    7. About ................................. |tag-surfer-about|
+    8. License ............................... |tag-surfer-license|
 
 
 
@@ -226,7 +227,7 @@ Default: "#"
 
 
 ==============================================================================
-4. Appearance                                          *tag-surfer-appearance*
+5. Appearance                                          *tag-surfer-appearance*
 
 
                                                          *'tsurf_max_results'*
@@ -388,7 +389,19 @@ Default: ..the value of |'tsurf_matches_color'|
 
 
 ==============================================================================
-5. About                                                    *tag-surfer-about*
+6. Changelog                                            *tag-surfer-changelog*
+
+1.0.1 (2013-08-31)
+
+    * Fix tag search with multiple filetypes.
+
+1.0 (2013-08-22)
+
+    * First release.
+
+
+==============================================================================
+7. About                                                    *tag-surfer-about*
 
 Author: Giacomo Comitti
 Contributors: https://github.com/gcmt/tag-surfer/contributors
@@ -396,7 +409,7 @@ Git repository: https://github.com/gcmt/tag-surfer
 
 
 ==============================================================================
-5. License                                                *tag-surfer-license*
+8. License                                                *tag-surfer-license*
 
 Copyright (c) 2013 Giacomo Comitti
 
