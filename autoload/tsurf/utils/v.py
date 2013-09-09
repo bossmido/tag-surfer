@@ -27,7 +27,7 @@ def cwd():
     return vim.eval('getcwd()')
 
 
-def synmatch(hlgroup, patt):
+def highlight(hlgroup, patt):
     """To highlight with `hlgroup` every occurrence of `patt`."""
     vim.command("syn match {} /{}/".format(hlgroup, patt))
 

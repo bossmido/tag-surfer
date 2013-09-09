@@ -479,11 +479,11 @@ class Renderer:
         """To color the Tag Surfer user interface."""
         vim.command("syntax clear")
         if error:
-            v.synmatch("TagSurferError", ".*")
+            v.highlight("TagSurferError", ".*")
         else:
-            v.synmatch("TagSurferShade", "@.*")
+            v.highlight("TagSurferShade", "@.*")
             indic_len = len(settings.get("current_line_indicator"))
             for i, match_positions in enumerate(self.last_matches):
                 for pos in match_positions:
                     patt = "\c\%{}l\%{}c.".format(i+1, pos+indic_len+1)
-                    v.synmatch("TagSurferMatches", patt)
+                    v.highlight("TagSurferMatches", patt)
