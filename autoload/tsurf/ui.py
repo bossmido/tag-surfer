@@ -325,16 +325,14 @@ class Renderer:
     def setup_colors(self):
         """To setup Tag Surfer highlight groups."""
         postfix = "" if vim.eval("&bg") == "light" else "_darkbg"
-        shade = settings.get("shade_color{}".format(postfix))
-        matches = settings.get("matches_color{}".format(postfix))
-
-        for g, color in (("Shade", shade), ("Matches", matches)):
-            if "=" in color:
-                vim.command("hi TagSurfer{} {}".format(g, color))
-            else:
-                vim.command("hi link TagSurfer{} {}".format(g, color))
-
-        vim.command("hi link TagSurferError WarningMsg")
+        colors = {
+            "TagSurferShade": settings.get("shade_color{}".format(postfix)),
+            "TagSurferMatches": settings.get("matches_color{}".format(postfix)),
+            "TagSurferError": "WarningMsg"
+        }
+        for group, color in colors.items():
+            link = "" if "=" in color else "link"
+            vim.command("hi {} {} {}".format(link, group, color))
 
     def render(self, target_win, curr_line_idx, query, tags, error=None):
         """To render all search results."""
